@@ -8,6 +8,8 @@
   2021:08:15 Android Wifi StateMachine(framework框架各种状态机 AndroidP 和 androidR之间的差异)  
   2021:08:16 Android Wifi连接 和 WIFI P2P扫描流程   
   2021:08:17 Android 热点启动流程  
+  2021:08:17 Android ARP检测机制,漫游与autojoin,DHCP流程,miracast流程  
+  
   
   
   
