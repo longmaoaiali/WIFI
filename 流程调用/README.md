@@ -1,64 +1,52 @@
-## 流程调用(pdf版本,visio版本)  
+# 流程调用(pdf版本,visio版本)  
 
-
-		AndroidR_startAP.pdf
-		
-		WiFiCertification.vsdx
-		
-		RTL8188GTV_扩展速率不支持导致部分ap扫描不到.vsdx
-		atbm60x2_init.pdf
-		atbm60x2_init.vsdx
-		mt7663加载固件.vsdx
-		mt76x8_ActiveScan.pdf
-		mt76x8_ActiveScan.vsdx
-		mt76x8_auth_deauth.pdf
-		mt76x8_auth_deauth.vsdx
-		mt76x8_beacon.pdf
-		mt76x8_beacon.vsdx
-		mt76x8_init.vsdx
-		mt76x8_probeRSP.vsdx
-		mtk7921_init.vsdx
-		rtl8723du_recv_rtp.pdf
-		rtl8723du_recv_rtp.vsdx
-		
-		Android音视频开发.vsdx
-		HwServiceManager.vsdx
-		bt_open.vsdx
-		bt_scan.pdf
-		bt_scan.vsdx
-		mtk_audio_data_write.vsdx
-		mtk_kernel_suspend.vsdx
-		wifi_loadDriver_android6_Msd648.vsdx
-		
-		
-		ARP探测机制导致wifi断开的流程.pdf
+	## STA
 		ARP探测机制导致wifi断开的流程.vsdx
-		AndroidR_wpas_hidlServices.pdf
 		AndroidR_wpas_hidlServices.vsdx
 		Autojoin_Rooming.vsdx
-		DHCP_STA.pdf
 		DHCP_STA.vsdx
 		NetworkMonitor网络检测.vsdx
-		WiFi-Disable.pdf
 		WiFi-Disable.vsdx
-		WiFi-Enable.pdf
 		WiFi-Enable.vsdx
 		WifiConfigStore.vsdx
 		del_station.vsdx
 		netd后台进程通过netlink监控网络状态通知NetworkManagementService .vsdx
-		wifiCounrtyCode.pdf
 		wifiCounrtyCode.vsdx
-		wifiStateMachine.pdf
 		wifiStateMachine.vsdx
-		wifi_connect.pdf
 		wifi_connect.vsdx
-		wifi_scan.pdf
-		wifi_scan.png
 		wifi_scan.vsdx
 		wifi_底层架构.png
 		wpas_atbm6022_DelStation.vsdx
 		从上到下框架.png
 		
+	## AP
+		AndroidR_startAP.vsdx
+		
+	## WifiDisplay
+		AndroidP_miracast.vsdx
+		P2PDiscovery.vsdx
+		WFD-sink.png
+		hdcp_TSPESpacket.vsdx
+		hisi35X_rtpSinkPlayer.vsdx
+		mtk_miracast.vsdx
+		mtk_miracast_RemoveGroup.vsdx
+		p2p_interface.vsdx
+		p2p_no_group_iface=1.vsdx
+		wpas_p2p_teardown.vsdx
+		
+	## Driver	
+		RTL8188GTV_扩展速率不支持导致部分ap扫描不到.vsdx
+		atbm60x2_init.vsdx
+		mt7663加载固件.vsdx
+		mt76x8_ActiveScan.vsdx
+		mt76x8_auth_deauth.vsdx
+		mt76x8_beacon.vsdx
+		mt76x8_init.vsdx
+		mt76x8_probeRSP.vsdx
+		mtk7921_init.vsdx
+		rtl8723du_recv_rtp.vsdx
+	
+	## TCP/IP
 		linux_ICMP发送与接收_数据包分段与重组.vsdx
 		linux_kernelNetlink.vsdx
 		linux_kernelNotifier.vsdx
@@ -72,22 +60,8 @@
 		socket_readWriteClose.vsdx
 		socket_函数到系统调用的流程ANDsocket文件系统的安装.vsdx
 		socket_结构体创建以及初始化.vsdx
-		
-		
-		AndroidP_miracast.pdf
-		AndroidP_miracast.vsdx
-		P2PDiscovery.pdf
-		P2PDiscovery.vsdx
-		WFD-sink.png
-		hdcp_TSPESpacket.vsdx
-		hisi35X_rtpSinkPlayer.pdf
-		hisi35X_rtpSinkPlayer.vsdx
-		mtk_miracast.vsdx
-		mtk_miracast_RemoveGroup.vsdx
-		p2p_interface.vsdx
-		p2p_no_group_iface=1.vsdx
-		wpas_p2p_teardown.vsdx
-		
+	
+	## WirelessTool
 		TC流量控制实现.vsdx
 		ethtool源码实现.vsdx
 		ifconfig设置MTU.vsdx
@@ -99,6 +73,17 @@
 		iwpriv.vsdx
 		iwspy.vsdx
 		tcpdump源码实现.vsdx
-  
+
+	## AutoTest
+		WiFiCertification.vsdx
+
+	## Other
+		Android音视频开发.vsdx
+		HwServiceManager.vsdx
+		bt_open.vsdx
+		bt_scan.vsdx
+		mtk_audio_data_write.vsdx
+		mtk_kernel_suspend.vsdx
+		wifi_loadDriver_android6_Msd648.vsdx
  
 
