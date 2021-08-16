@@ -1,6 +1,6 @@
 # 流程调用(pdf版本,visio版本)  
 
-	##STA
+	## STA
 		ARP探测机制导致wifi断开的流程.vsdx
 		AndroidR_wpas_hidlServices.vsdx
 		Autojoin_Rooming.vsdx
@@ -19,7 +19,7 @@
 		wpas_atbm6022_DelStation.vsdx
 		从上到下框架.png
 		
-	##AP
+	## AP
 		AndroidR_startAP.vsdx
 		
 	##WifiDisplay
