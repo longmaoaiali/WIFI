@@ -1,7 +1,7 @@
 # WIFI协议的解读, Android WIFI的代码流程, 常见的WIFI问题  
 
 ## WIFI协议  
-
+  Beacon -- Beacon帧字段解析，包含HE Element(WIFI6)  
 ## 流程调用(pdf版本,visio版本)  
   STA -- 作为station连接AP的代码流程   
   AP -- 作为热点AP   
