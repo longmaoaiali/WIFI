@@ -1,0 +1,31 @@
+From 02b7c3e296086ead0bfb407f39394512bee2376d Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Thu, 04 Mar 2021 16:14:56 +0800
+Subject: [PATCH] [bugfix][JIRA#PT210001-147][WiFi][common]miracast disconnect probability does not scan the device
+
+[what]miracast disconnect probability does not scan the device
+[why]p2p send find command and stay listen status short
+[how]modify stay listen status time
+
+Change-Id: I7070c25ff261280a0d1c89268eef7ed6de6ca701
+---
+
+diff --git a/wpa_supplicant_8/src/p2p/p2p.c b/wpa_supplicant_8/src/p2p/p2p.c
+index 1a31ef2..2ab814d 100644
+--- a/wpa_supplicant_8/src/p2p/p2p.c
++++ b/wpa_supplicant_8/src/p2p/p2p.c
+@@ -2966,8 +2966,10 @@
+ 
+ 	p2ps_gen_hash(p2p, P2PS_WILD_HASH_STR, p2p->wild_card_hash);
+ 
+-	p2p->min_disc_int = 1;
+-	p2p->max_disc_int = 3;
++	//CVTE MODIFY for miracsat disconnect probability does not scan the device
++	p2p->min_disc_int = 3;
++	p2p->max_disc_int = 6;
++	//CVTE END
+ 	p2p->max_disc_tu = -1;
+ 
+ 	if (os_get_random(&p2p->next_tie_breaker, 1) < 0)
+
+//增加find 阶段中listen的时长,search时长保持不变
