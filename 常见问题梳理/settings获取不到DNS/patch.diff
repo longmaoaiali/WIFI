@@ -1,0 +1,25 @@
+From b5bb1648ffd574aaf9193a7382761d8e94bd4ba5 Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Tue, 02 Feb 2021 16:34:50 +0800
+Subject: [PATCH] [bugfix][JIRA#PT200026-991][ethernet][common]ethernet no permissions get dns values
+
+[what]ethernet no permissions get dns values
+[why]ethernet cannot get the value of DNS
+[how]add prop permissions to the wire in settings
+
+Change-Id: I6ed60a0bfcce91f36dbe9465c270a142eca8e2ff
+---
+
+diff --git a/common/sepolicy/system_app.te b/common/sepolicy/system_app.te
+index f3f16b9..d35e609 100755
+--- a/common/sepolicy/system_app.te
++++ b/common/sepolicy/system_app.te
+@@ -103,6 +103,8 @@
+ allow system_app imageserver_hwservice:hwservice_manager { find };
+ allow system_app imageserver:binder { call transfer };
+ 
++allow system_app net_dns_prop:file { read open getattr };
++
+ allow system_app cache_file:file { rename execute getattr open read };
+ allow system_app tv_prop:property_service { set };
+ 

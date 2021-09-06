@@ -1,0 +1,31 @@
+From 32ede59c59a59d6a2e19a574a63bf608eddcc99c Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Tue, 02 Feb 2021 16:27:11 +0800
+Subject: [PATCH] [bugfix][JIRA#PT200026-1023][WiFi][common]modify wifi default support 2.4G channel
+
+[what]modify wifi default support 2.4G channel
+[why]only JP support 14 channel
+[how]modify wifi default no support 2.4G 14 channel
+
+Change-Id: Ic9af99249c1baf347682e41dbbb025b4da301c6b
+---
+
+diff --git a/net/wireless/reg.c b/net/wireless/reg.c
+index 5dbac37..44c344d 100644
+--- a/net/wireless/reg.c
++++ b/net/wireless/reg.c
+@@ -226,9 +226,11 @@
+ 			NL80211_RRF_NO_IR | NL80211_RRF_AUTO_BW),
+ 		/* IEEE 802.11 channel 14 - Only JP enables
+ 		 * this and for 802.11b only */
+-		REG_RULE(2484-10, 2484+10, 20, 6, 20,
+-			NL80211_RRF_NO_IR |
+-			NL80211_RRF_NO_OFDM),
++		//CVTE MODIFY for default 2.4G channel no support 14 channel
++		//REG_RULE(2484-10, 2484+10, 20, 6, 20,
++		//	NL80211_RRF_NO_IR |
++		//	NL80211_RRF_NO_OFDM),
++		//CVTE END
+ 		/* IEEE 802.11a, channel 36..48 */
+ 		REG_RULE(5180-10, 5240+10, 80, 6, 20,
+                         NL80211_RRF_NO_IR |

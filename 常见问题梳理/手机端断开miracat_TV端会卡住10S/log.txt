@@ -1,0 +1,12 @@
+问题原因，p2p链路断开时，进入断开流程，p2p group idle timeout 设置了10秒超时导致。需要修改p2p 断开流程。将断开event事件第一时间反馈给Android框架。
+Line 8830: 01-01 05:44:07.510  3640  3640 D wpa_supplicant: p2p0: State: COMPLETED -> DISCONNECTED
+Line 8830: 01-01 05:44:07.510  3640  3640 D wpa_supplicant: p2p0: State: COMPLETED -> DISCONNECTED
+Line 8833: 01-01 05:44:07.511  3640  3640 E wpa_supplicant: p2p0: td: wpa_supplicant_set_state wpa_drv_set_operstate
+Line 8834: 01-01 05:44:07.511  3640  3640 D wpa_supplicant: P2P: td: wpas_p2p_notif_disconnected --11
+Line 8835: 01-01 05:44:07.511  3640  3640 D wpa_supplicant: P2P: td: wpas_p2p_notif_disconnected --11111
+Line 8836: 01-01 05:44:07.511  3640  3640 D wpa_supplicant: P2P: td: Set P2P group idle timeout to 10 seconds
+Line 9155: 01-01 05:44:17.530  3640  3640 E wpa_supplicant: p2p0: td: wpa_supplicant_set_state wpa_drv_set_operstate
+Line 9155: 01-01 05:44:17.530  3640  3640 E wpa_supplicant: p2p0: td: wpa_supplicant_set_state wpa_drv_set_operstate
+Line 9201: 01-01 05:44:17.709  4953  4953 E amlSink : td: action = android.net.wifi.p2p.PEERS_CHANGED
+Line 9202: 01-01 05:44:17.710  4953  4953 E amlSink : td: action = android.net.wifi.p2p.THIS_DEVICE_CHANGED
+Line 9203: 01-01 05:44:17.710  4953  4953 E amlSink : td: action = android.net.wifi.p2p.CONNECTION_STATE_CHANGE

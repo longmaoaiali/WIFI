@@ -1,0 +1,31 @@
+From 5200c54ed526a2acf08970f9e991a717ed84da5c Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Thu, 18 Feb 2021 17:38:11 +0800
+Subject: [PATCH] [bugfix][JIRA#PT200026-1236][WiFi][common]using part of phone miracast function connect tv and slowed 10s when disconnected
+
+[what]using part of phone miracast function connect tv and slowed 10s when disconnected
+[why]p2p link abnormal in disconnect process
+[how]solve the problem of P2P link exercise process
+
+Change-Id: I6216bb1511e4e9cd0584b63bc6d6c96c7a2f5158
+---
+
+diff --git a/wpa_supplicant_8/wpa_supplicant/p2p_supplicant.c b/wpa_supplicant_8/wpa_supplicant/p2p_supplicant.c
+index f3987f2..0c18b3a 100644
+--- a/wpa_supplicant_8/wpa_supplicant/p2p_supplicant.c
++++ b/wpa_supplicant_8/wpa_supplicant/p2p_supplicant.c
+@@ -7461,8 +7461,12 @@
+ 	wpas_p2p_disable_cross_connect(wpa_s);
+ 	if (!wpa_s->ap_iface &&
+ 	    !eloop_is_timeout_registered(wpas_p2p_group_idle_timeout,
+-					 wpa_s, NULL))
++					 wpa_s, NULL)) {
++		//CVTE ADD for part of phone disconnect and slowed for 10s using miracast app
++		wpa_s->conf->p2p_group_idle = 1;
++		//CVTE END
+ 		wpas_p2p_set_group_idle_timeout(wpa_s);
++	}
+ }
+ 
+ //设置断开的超时时间是1S 而不是10S
+ 

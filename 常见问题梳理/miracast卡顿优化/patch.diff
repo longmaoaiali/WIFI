@@ -1,0 +1,70 @@
+From 9845f82373fba86e364c9ec50fcdf58cb89e90ca Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Sat, 20 Feb 2021 11:30:57 +0800
+Subject: [PATCH] [bugfix][JIRA#PT200026-831][Miracast][common][2/2]optimization of the problem of projection screen lapping using Miracast app
+
+[what]optimization of the problem of projection screen lapping using Miracast app
+[why]wifi function effects on miracast screen projection
+[how]disconnect wifi and drop wifi scan when using miracast app
+
+Change-Id: Icb122bb1bb9e1a34651c9263a053492d3761cfd8
+---
+
+diff --git a/amlogic/common/apps/Miracast/src/com/droidlogic/miracast/WiFiDirectMainActivity.java b/amlogic/common/apps/Miracast/src/com/droidlogic/miracast/WiFiDirectMainActivity.java
+index a6d627e..f910548 100755
+--- a/amlogic/common/apps/Miracast/src/com/droidlogic/miracast/WiFiDirectMainActivity.java
++++ b/amlogic/common/apps/Miracast/src/com/droidlogic/miracast/WiFiDirectMainActivity.java
+@@ -695,8 +695,32 @@
+         registerReceiver(mReceiver, intentFilter);
+         changeRole(true);
+         tryDiscoverPeers();
++        //CVTE ADD for optimization of the problem of projection screen lapping in Miracast app
++        if (wifiIsConnected()) {
++            mWifiManager.disconnect();
++            Log.d(TAG, "disconnect wifi connect when enter miracast app");
++        }
++        //CVTE END
+     }
+ 
++    //CVTE ADD for optimization of the problem of projection screen lapping in Miracast app
++    private boolean wifiIsConnected() {
++        if(mWifiManager == null) {
++            mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
++        }
++
++        WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
++        if(wifiInfo != null) {
++            String bssid = wifiInfo.getBSSID();
++            if( bssid != null && !"00:00:00:00:00:00".equals(bssid) ) {
++                Log.d(TAG, "Wifi Sta status is connected wifi_info:" + wifiInfo.toString());
++                return true;
++            }
++        }
++        return false;
++    }
++    //CVTE END
++
+     private final Runnable startSearchRunnable = new Runnable()
+     {
+         @Override
+@@ -1042,11 +1066,20 @@
+         mPref = PreferenceManager.getDefaultSharedPreferences (this);
+         mEditor = mPref.edit();
+         changeRole(true);
++        //CVTE ADD for optimization of the problem of projection screen lapping in Miracast app
++        SystemProperties.set("sys.miracast.state","true");
++        //CVTE END
+     }
+ 
+     @Override
+     protected void onDestroy()
+     {
++        //CVTE ADD for optimization of the problem of projection screen lapping in Miracast app
++        SystemProperties.set("sys.miracast.state","false");
++        if(null != mWifiManager) {
++            mWifiManager.startScan();
++        }
++        //CVTE END
+         changeRole(false);
+         Log.d (TAG, "onDestroy do stopPeerDiscovery");
+         setIsWifiP2pEnabled (false);

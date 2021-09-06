@@ -1,0 +1,38 @@
+From 5b9fe3e31f610b856c138410a798193b24ec407d Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Fri, 05 Feb 2021 09:45:45 +0800
+Subject: [PATCH] [bugfix][JIRA#PT200026-1154][ethernet][common]toggle the wired switch casue setting crash of null pointer
+
+[what]toggle the wired switch casue setting crash of null pointer
+[why]get linkProperties instance is null
+[how]add null-check for get linkProperties and linkProperties.getLinkAddresses instance
+
+Change-Id: I61acd1c62bb12e944e99cac2ff09eeb8fd512ba7
+---
+
+diff --git a/base/packages/cvte/android-system-adapter/platform/android28/com/cvte/adapter/android/net/EthernetManagerAdapter.java b/base/packages/cvte/android-system-adapter/platform/android28/com/cvte/adapter/android/net/EthernetManagerAdapter.java
+index 4017ad3..d6ba620 100755
+--- a/base/packages/cvte/android-system-adapter/platform/android28/com/cvte/adapter/android/net/EthernetManagerAdapter.java
++++ b/base/packages/cvte/android-system-adapter/platform/android28/com/cvte/adapter/android/net/EthernetManagerAdapter.java
+@@ -323,13 +323,15 @@
+         final StringBuilder sb = new StringBuilder();
+         boolean gotAddress = false;
+         final LinkProperties linkProperties = mConnectivityManager.getLinkProperties(network);
+-        for (LinkAddress linkAddress : linkProperties.getLinkAddresses()) {
+-            if(linkAddress.getAddress().getHostAddress().contains(".")){
+-                if (gotAddress) {
+-                    sb.append("\n");
++        if (linkProperties != null && linkProperties.getLinkAddresses() != null) {
++            for (LinkAddress linkAddress : linkProperties.getLinkAddresses()) {
++                if(linkAddress.getAddress().getHostAddress().contains(".")){
++                    if (gotAddress) {
++                        sb.append("\n");
++                    }
++                    sb.append(linkAddress.getAddress().getHostAddress());
++                    gotAddress = true;
+                 }
+-                sb.append(linkAddress.getAddress().getHostAddress());
+-                gotAddress = true;
+             }
+         }
+         if (gotAddress) {
