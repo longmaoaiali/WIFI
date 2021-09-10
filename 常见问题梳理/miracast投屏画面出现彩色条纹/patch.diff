@@ -1,0 +1,36 @@
+From f8ea2867de903728699cc6988dbeab47be8f0c94 Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Wed, 21 Oct 2020 17:05:07 +0800
+Subject: [PATCH] [bugfix][JIRA#SMARTPDT-5314][WiFi][common]redmi phone projection shows the noise use Miracast
+
+[what]redmi phone projection shows the noise use Miracast
+[why]redmi phone negotiate support for skip frame and dynamic video rates function
+[how]close TV support for skip frame and dynamic video rates function
+
+Change-Id: I8b5c5e15c890736136168430550ca145fc645718
+---
+
+diff --git a/n-cn/vendor/mediatek/open/hardware/wfd_client/wifi_display/rtsp_if/src/WfdRtspProtocol.cpp b/n-cn/vendor/mediatek/open/hardware/wfd_client/wifi_display/rtsp_if/src/WfdRtspProtocol.cpp
+index 5952e6b..3e4bd50 100755
+--- a/n-cn/vendor/mediatek/open/hardware/wfd_client/wifi_display/rtsp_if/src/WfdRtspProtocol.cpp
++++ b/n-cn/vendor/mediatek/open/hardware/wfd_client/wifi_display/rtsp_if/src/WfdRtspProtocol.cpp
+@@ -685,8 +685,19 @@
+         vector<string> vedioSegs;
+         parseToMeta(str, " ", vedioSegs);
+ #if 1
++        //CVTE ADD for miracast app projection and screen shows the noise, close Dynamic video refresh rate and skip frame functions
++        int counter = 0;
++        //CVTE END
+         for(vector<string>::iterator iter = vedioSegs.begin(); iter != vedioSegs.end(); iter++)
+         {
++            //CVTE ADD for miracast app projection and screen shows the noise, close Dynamic video refresh rate and skip frame functions
++            if(strncmp((*iter).c_str(), "11", 2) == 0)
++            {
++                WFD_DBG(WFD_DBG_ERR, "WfdRtspProtocol::handleWfdVideoFormats modify seg = %s to 00. \n", (*iter).c_str());
++                vedioSegs.at(counter) = "00";
++            }
++            counter++;
++            //CVTE END
+             WFD_DBG(WFD_DBG_ERR, "WfdRtspProtocol::handleWfdVideoFormats seg = %s \n", (*iter).c_str());
+         }
+ #endif

@@ -1,0 +1,55 @@
+From 4cae012ef0f32fd6998a3471ffe9b60fd936dbd5 Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Wed, 16 Sep 2020 20:18:52 +0800
+Subject: [PATCH] [merge][cp-from@0dd7386c][bugfix][JIRA#EH200084-473][WiFi@8723][common]resolve for can not scan individual wifi network and close debug print
+
+[what]resolve for can not scan individual wifi network and close debug print
+[why]the original driver handled the beacon and probe response frame fields error
+[how]modify the processing rate field logic
+
+Change-Id: I22fd034a47457092a2488c8461740c37cb2a7e20
+---
+
+diff --git a/linux_mts/ko_modules/wlan_driver/rtl8723DU/Makefile b/linux_mts/ko_modules/wlan_driver/rtl8723DU/Makefile
+index e41ed8f..a2cab5f 100755
+--- a/linux_mts/ko_modules/wlan_driver/rtl8723DU/Makefile
++++ b/linux_mts/ko_modules/wlan_driver/rtl8723DU/Makefile
+@@ -97,7 +97,7 @@
+ endif
+ 
+ ########################## Debug ###########################
+-CONFIG_RTW_DEBUG = y
++CONFIG_RTW_DEBUG = n
+ # default log level is _DRV_INFO_ = 4,
+ # please refer to "How_to_set_driver_debug_log_level.doc" to set the available level.
+ CONFIG_RTW_LOG_LEVEL = 5
+diff --git a/linux_mts/ko_modules/wlan_driver/rtl8723DU/core/rtw_wlan_util.c b/linux_mts/ko_modules/wlan_driver/rtl8723DU/core/rtw_wlan_util.c
+index 50079db..21c4e42 100755
+--- a/linux_mts/ko_modules/wlan_driver/rtl8723DU/core/rtw_wlan_util.c
++++ b/linux_mts/ko_modules/wlan_driver/rtl8723DU/core/rtw_wlan_util.c
+@@ -2258,10 +2258,24 @@
+ bool rtw_validate_value(u16 EID, u8 *p, u16 len)
+ {
+ 	u8 rate;
+-	u32 i, nr_val;
++	//CVTE ADD for cannot scan individual wifi networks
++	u32 i, nr_val, count;
++	//CVTE END
+ 
+ 	switch (EID) {
++	//CVTE MODIFY for cannot scan individual wifi networks
+ 	case _EXT_SUPPORTEDRATES_IE_:
++		count = 0;
++		nr_val = len;
++		for (i=0; i<nr_val; i++) {
++			rate = *(p+i);
++			if (match_ranges(EID, rate) == _FALSE)
++				count++;
++		}
++		if(count ==  i)
++			return _FALSE;
++		break;
++	//CVTE END
+ 	case _SUPPORTEDRATES_IE_:
+ 		nr_val = len;
+ 		for (i=0; i<nr_val; i++) {

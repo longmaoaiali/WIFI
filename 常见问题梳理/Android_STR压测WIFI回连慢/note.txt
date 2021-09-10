@@ -1,0 +1,2 @@
+NetworkStatsService会导致系统堵塞，binder被占用
+TV上无需流量统计的逻辑，对该功能进行裁剪

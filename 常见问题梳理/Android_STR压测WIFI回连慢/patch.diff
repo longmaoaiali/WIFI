@@ -1,0 +1,87 @@
+From 6a1cb1d37d7cb501a765e81e1a94f64d88531146 Mon Sep 17 00:00:00 2001
+From: xiaqing <xiaqing@cvte.com>
+Date: Thu, 12 Mar 2020 10:41:45 +0800
+Subject: [PATCH] [bugfix][JIRA#MD200087-195][STR][NETWORK][common]fix wifi connect low after str
+
+[what]修复长时间str后，wifi回连慢的问题
+[why]NetworkStatsService会导致系统堵塞，binder被占用
+[how]TV上无需流量统计的逻辑，对该功能进行裁剪
+
+Change-Id: I71eb49fdfacd38f479b28e1d891b6337cbdcea97
+---
+
+diff --git a/base/services/core/java/com/android/server/net/NetworkStatsService.java b/base/services/core/java/com/android/server/net/NetworkStatsService.java
+old mode 100644
+new mode 100755
+index addc479..77636eb
+--- a/base/services/core/java/com/android/server/net/NetworkStatsService.java
++++ b/base/services/core/java/com/android/server/net/NetworkStatsService.java
+@@ -299,6 +299,11 @@
+ 
+     private final static int DUMP_STATS_SESSION_COUNT = 20;
+ 
++    // CVTE Patch Begin  TV上不需要流量统计的功能，需要裁剪掉 
++    // 目前看到该类在广播中处理耗时逻辑，WakeLock以及对象锁的存在，导致str有几率会卡死在这里
++    private boolean isCloseNetworkStats = true;
++    // CVTE Patch End
++
+     private static @NonNull File getDefaultSystemDir() {
+         return new File(Environment.getDataDirectory(), "system");
+     }
+@@ -881,7 +886,7 @@
+         // update and persist if beyond new thresholds
+         final long currentTime = mClock.millis();
+         synchronized (mStatsLock) {
+-            if (!mSystemReady) return;
++            if (!mSystemReady || isCloseNetworkStats) return;
+ 
+             updatePersistThresholdsLocked();
+ 
+@@ -1081,7 +1086,7 @@
+      */
+     @GuardedBy("mStatsLock")
+     private void updateIfacesLocked(Network[] defaultNetworks) {
+-        if (!mSystemReady) return;
++        if (!mSystemReady || isCloseNetworkStats) return;
+         if (LOGV) Slog.v(TAG, "updateIfacesLocked()");
+ 
+         // take one last stats snapshot before updating iface mapping. this
+@@ -1264,7 +1269,7 @@
+      */
+     @GuardedBy("mStatsLock")
+     private void performPollLocked(int flags) {
+-        if (!mSystemReady) return;
++        if (!mSystemReady || isCloseNetworkStats) return;
+         if (LOGV) Slog.v(TAG, "performPollLocked(flags=0x" + Integer.toHexString(flags) + ")");
+         Trace.traceBegin(TRACE_TAG_NETWORK, "performPollLocked");
+ 
+@@ -1434,6 +1439,9 @@
+ 
+     @Override
+     protected void dump(FileDescriptor fd, PrintWriter rawWriter, String[] args) {
++        if (isCloseNetworkStats) {
++            return;
++        }
+         if (!DumpUtils.checkDumpPermission(mContext, TAG, rawWriter)) return;
+ 
+         long duration = DateUtils.DAY_IN_MILLIS;
+@@ -1716,6 +1724,9 @@
+         @Override
+         public void foundNonMonotonic(NetworkStats left, int leftIndex, NetworkStats right,
+                 int rightIndex, String cookie) {
++            if (isCloseNetworkStats) {
++                return;
++            }
+             Log.w(TAG, "Found non-monotonic values; saving to dropbox");
+ 
+             // record error for debugging
+@@ -1732,6 +1743,9 @@
+         @Override
+         public void foundNonMonotonic(
+                 NetworkStats stats, int statsIndex, String cookie) {
++            if (isCloseNetworkStats) {
++                return;
++            }
+             Log.w(TAG, "Found non-monotonic values; saving to dropbox");
+ 
+             final StringBuilder builder = new StringBuilder();
