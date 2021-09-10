@@ -1,0 +1,48 @@
+From d7445f35a7376452187bb8e0d21d350bbb1618af Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Tue, 30 Jun 2020 14:59:58 +0800
+Subject: [PATCH] [feature][JIRA#SMARTPDT-5764][WiFi@ATBM60X2][common]error reason message of broadcast with failed WiFi connection
+
+[what]error reason message of broadcast with failed WiFi connection
+[why]framework send message error
+[how]modify framework send message info
+
+Change-Id: I5160ec06701c95077f388a5e67f53cc68f24dee1
+---
+
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStateTracker.java b/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStateTracker.java
+old mode 100644
+new mode 100755
+index aa913f3..6291fd3
+--- a/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStateTracker.java
++++ b/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStateTracker.java
+@@ -229,7 +229,10 @@
+                     WifiManager.EXTRA_SUPPLICANT_ERROR_REASON,
+                     reasonCode);
+         }
+-        mContext.sendStickyBroadcastAsUser(intent, UserHandle.ALL);
++        //CVTE MODIFY for error reason message of broadcast with failed WiFi connection
++        //mContext.sendStickyBroadcastAsUser(intent, UserHandle.ALL);
++        mContext.sendBroadcastAsUser(intent, UserHandle.ALL);
++        //CVTE END
+     }
+ 
+     /********************************************************
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java b/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
+old mode 100644
+new mode 100755
+index 72e3dfc..901a9c8
+--- a/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
++++ b/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
+@@ -3910,7 +3910,10 @@
+                 case WifiMonitor.AUTHENTICATION_FAILURE_EVENT:
+                     mWifiDiagnostics.captureBugReportData(
+                             WifiDiagnostics.REPORT_REASON_AUTH_FAILURE);
+-                    mSupplicantStateTracker.sendMessage(WifiMonitor.AUTHENTICATION_FAILURE_EVENT);
++                    //CVTE MODIFY for error reason message of broadcast with failed WiFi connection
++                    //mSupplicantStateTracker.sendMessage(WifiMonitor.AUTHENTICATION_FAILURE_EVENT);
++                    mSupplicantStateTracker.sendMessage(Message.obtain(message));
++                    //CVTE END
+                     int disableReason = WifiConfiguration.NetworkSelectionStatus
+                             .DISABLED_AUTHENTICATION_FAILURE;
+                     reasonCode = message.arg1;

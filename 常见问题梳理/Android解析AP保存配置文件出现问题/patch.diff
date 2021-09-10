@@ -1,0 +1,35 @@
+From 9a71970eff7c87f51d0b3271c420aad398054dc3 Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Thu, 14 May 2020 10:21:04 +0800
+Subject: [PATCH] [feature][JIRA#SMARTPDT-5764][WiFi@ATBM60X2][common]wifi cannot connect network due to parser wep network info failed in store xml file
+
+[what]wifi cannot connect wifi network
+[why]parser wep network info failed in store xml file
+[how]saved wep network and validation information are different and validation is ignored
+
+Change-Id: Iff63c548071e02066c486db00ea6f3188b022dc6
+---
+
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/NetworkListStoreData.java b/opt/net/wifi/service/java/com/android/server/wifi/NetworkListStoreData.java
+index 9330a60..10ab0d2 100644
+--- a/opt/net/wifi/service/java/com/android/server/wifi/NetworkListStoreData.java
++++ b/opt/net/wifi/service/java/com/android/server/wifi/NetworkListStoreData.java
+@@ -288,9 +288,15 @@
+         WifiConfiguration configuration = parsedConfig.second;
+         String configKeyCalculated = configuration.configKey();
+         if (!configKeyParsed.equals(configKeyCalculated)) {
+-            throw new XmlPullParserException(
+-                    "Configuration key does not match. Retrieved: " + configKeyParsed
+-                            + ", Calculated: " + configKeyCalculated);
++            //CVTE ADD for wifi cannot connect network due to parser store xml file failed
++            if(configKeyParsed.contains("WEP")) {
++                Log.e(TAG, "WEP network ignore calculated.");
++            } else {
++                throw new XmlPullParserException(
++                        "Configuration key does not match. Retrieved: " + configKeyParsed
++                                + ", Calculated: " + configKeyCalculated);
++            }
++            //CVTE END
+         }
+         // Set creatorUid/creatorName for networks which don't have it set to valid value.
+         String creatorName = mContext.getPackageManager().getNameForUid(configuration.creatorUid);

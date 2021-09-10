@@ -1,0 +1,43 @@
+From e6c23a189608d29d6351361ca71c5cef7b71efe8 Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Sat, 09 May 2020 16:21:55 +0800
+Subject: [PATCH] [feature][JIRA#SMARTPDT-5764][WiFi@ATBM60X2][common]android9.0 first enter error psk and second enter correct psk cannot connect
+
+[what]first enter error psk and second enter correct psk cannot connect
+[why]first error psk connect auth failure flag not initialized at second connect processs
+[how]init the auth failure flag at each connect network
+
+Change-Id: I286f3f9619739d0f134279a23ceecc9f5014ecca
+---
+
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStateTracker.java b/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStateTracker.java
+index db4e5ce..aa913f3 100644
+--- a/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStateTracker.java
++++ b/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStateTracker.java
+@@ -92,6 +92,12 @@
+         }
+     }
+ 
++    //CVTE ADD for resolve first enter error psk and second enter correct psk cannot connect
++    public void resetAuthStatus() {
++        mAuthFailureInSupplicantBroadcast = false;
++    }
++    //CVTE END
++
+     public String getSupplicantStateName() {
+         return getCurrentState().getName();
+     }
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java b/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
+index f8b2581..72e3dfc 100644
+--- a/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
++++ b/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
+@@ -4119,6 +4119,9 @@
+                     int uid = message.arg2;
+                     bssid = (String) message.obj;
+ 
++                    //CVTE ADD for resolve first enter error psk and second enter correct psk cannot connect
++                    mSupplicantStateTracker.resetAuthStatus();
++                    //CVTE EDN
+                     synchronized (mWifiReqCountLock) {
+                         if (!hasConnectionRequests()) {
+                             if (mNetworkAgent == null) {

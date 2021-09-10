@@ -1,0 +1,229 @@
+=~=~=~=~=~=~=~=~=~=~=~= MobaXterm log 2021.01.25 20:14:38 =~=~=~=~=~=~=~=~=~=~=~=
+[  664.744226] 
+[2021-01-25 20:14:38]  [  665.618638] type=1400 audit(1611512109.495:786): avc: denied { connectto } for comm="HwBinder:339_2" path=002F646174612F6D6973632F626C756564726F69642F2E766F6963655F6374726C scontext=u:r:hal_audio_mstar:s0 tcontext=u:r:hidraw:s0 tclass=unix_stream_socket permissive=0
+[2021-01-25 20:14:38]  [  665.644561] type=1400 audit(1611512109.495:785): avc: denied { connectto } for comm="HwBinder:339_2" path=002F646174612F6D6973632F626C756564726F69642F2E766F6963655F64617461 scontext=u:r:hal_audio_mstar:s0 tcontext=u:r:hidraw:s0 tclass=unix_stream_socket permissive=0
+[2021-01-25 20:14:38]  [  666.271978] MApi_AudioAmp_ExtendCmd[1175]: Invalid params, _au32DeviceId[u8DeviceIndex]:0 != pstParams->u32DeviceId:255
+[2021-01-25 20:14:39]  [  666.283423] 
+[2021-01-25 20:14:40]  [  666.856498] init: starting service 'vendor.drm-playready-hal-1-3'...
+[2021-01-25 20:14:40]  [  666.896772] init: Service 'vendor.drm-playready-hal-1-3' (pid 3730) exited with status 0
+[2021-01-25 20:14:40]  [  666.905042] init: Sending signal 9 to service 'vendor.drm-playready-hal-1-3' (pid 3730) process group...
+[2021-01-25 20:14:40]  [  666.915091] libprocessgroup: Successfully killed process cgroup uid 1013 pid 3730 in 0ms
+[2021-01-25 20:14:40]  [  667.618791] type=1400 audit(1611512111.495:788): avc: denied { connectto } for comm="HwBinder:339_2" path=002F646174612F6D6973632F626C756564726F69642F2E766F6963655F64617461 scontext=u:r:hal_audio_mstar:s0 tcontext=u:r:hidraw:s0 tclass=unix_stream_socket permissive=0
+[2021-01-25 20:14:40]  [  667.642720] type=1400 audit(1611512111.495:787): avc: denied { connectto } for comm="HwBinder:339_2" path=002F646174612F6D6973632F626C756564726F69642F2E766F6963655F6374726C scontext=u:r:hal_audio_mstar:s0 tcontext=u:r:hidraw:s0 tclass=unix_stream_socket permissive=0
+[2021-01-25 20:14:40]  [  667.718664] [GLUE][IR]u8KeyCode: 0x001c , u8KeyState: 0x0
+[2021-01-25 20:14:40]  [  667.803960] MApi_AudioAmp_ExtendCmd[1175]: Invalid params, _au32DeviceId[u8DeviceIndex]:0 != pstParams->u32DeviceId:255
+[2021-01-25 20:14:41]  [  667.815392] 
+[2021-01-25 20:14:41]  [  667.871994] [GLUE][IR]u8KeyCode: 0x001c , u8KeyState: 0x2
+[2021-01-25 20:14:41]  [  667.892716] [atbm_log]:atbm_hw_scan:if_id(0)
+[2021-01-25 20:14:41]  [  667.897212] [atbm_log]:atbm_hw_scan:scan, delay suspend
+[2021-01-25 20:14:41]  [  667.902635] [atbm_log]:scan start band(0),(14)
+[2021-01-25 20:14:41]  [  667.925457] <MI3_DEBUG>[PID:3506][_MI_AOUT_NotifyConnectInput:8386]hAout:0x17000000,hInput:0x81000000
+[2021-01-25 20:14:41]  [  667.962212] <MI3_ERR>_MI_OSD_MappingColorFmtMi2AfbcFmt[1146]: Cannot cast eColorFmt(7), use E_GOP_FB_AFBC_V1P2_ARGB8888 as default.
+[2021-01-25 20:14:41]  [  668.090916] [atbm_log]:atbm_cancel_hw_scan:[0]
+[2021-01-25 20:14:41]  [  669.018666] [atbm_log]:hw_priv->scan.status 0
+[2021-01-25 20:14:42]  [  669.023090] [atbm_log]:atbm_scan_work:end(0)
+[2021-01-25 20:14:42]  [  669.027713] [atbm_log]:atbm_wait_scan_complete_sync
+[2021-01-25 20:14:42]  [  669.032690] [atbm_log]:wlan0:free authen bss ++
+[2021-01-25 20:14:42]  [  669.051964] [atbm_log]:wlan0:free authen bss ++
+[2021-01-25 20:14:42]  [network] 669.076, ni_mon_thread.1471 >>> [NETLINK] receive event
+[2021-01-25 20:14:42]  [network] 669.076, read_netlink.1399 >>> [NETLINK],RTM_NEWLINK
+[2021-01-25 20:14:42]  [network] 669.076, _print_newlink_info.1287 >>> [NETLINK]Interface:wlan0 Link:Down
+[2021-01-25 20:14:42]  [network] 669.110, ni_mon_thread.1471 >>> [NETLINK] receive event
+[2021-01-25 20:14:42]  [network] 669.110, read_netlink.1399 >>> [NETLINK],RTM_NEWLINK
+[2021-01-25 20:14:42]  [network] 669.110, _print_newlink_info.1287 >>> [NETLINK]Interface:wlan0 Link:Down
+[2021-01-25 20:14:42]  [  669.255765] [atbm_log]:wlan0:free authen bss ++
+[2021-01-25 20:14:42]  [  669.303973] [atbm_log]:authen:(04:02:1f:55:52:c0),ssid(INDIA_VPN)
+[2021-01-25 20:14:42]  [  669.310793] [atbm_log]:[TX]:authen, delay suspend
+[2021-01-25 20:14:42]  [  669.340204] MApi_AudioAmp_ExtendCmd[1175]: Invalid params, _au32DeviceId[u8DeviceIndex]:0 != pstParams->u32DeviceId:255
+[2021-01-25 20:14:42]  [  669.353198] 
+[2021-01-25 20:14:42]  [  669.358396] [atbm_log]:wlan0: authenticated
+[2021-01-25 20:14:42]  [  669.367322] [atbm_log]:wlan0:free authen bss ++
+[2021-01-25 20:14:42]  [  669.403988] [atbm_log]:wlan0:free authen bss --
+[2021-01-25 20:14:42]  [  669.414336] [atbm_log]:wlan0: associated
+[2021-01-25 20:14:42]  [  669.438480] <MI3_ERR>_MI_OSD_MappingColorFmtMi2AfbcFmt[1146]: Cannot cast eColorFmt(7), use E_GOP_FB_AFBC_V1P2_ARGB8888 as default.
+[2021-01-25 20:14:42]  [  669.451311] [atbm_log]:[04:02:1f:55:52:c0]:40M channel
+[2021-01-25 20:14:42]  [network] 669.430, ni_mon_thread.1471 >>> [NETLINK] receive event
+[2021-01-25 20:14:42]  [network] 669.430, read_netlink.1399 >>> [NETLINK],RTM_NEWLINK
+[2021-01-25 20:14:42]  [network] 669.430, _print_newlink_info.1287 >>> [NETLINK]Interface:wlan0 Link:Up
+[2021-01-25 20:14:42]  [network] 669.431, ni_mon_thread.1471 >>> [NETLINK] receive event
+[2021-01-25 20:14:42]  [network] 669.431, read_netlink.1399 >>> [NETLINK],RTM_NEWLINK
+[2021-01-25 20:14:42]  [network] 669.431, _print_newlink_info.1287 >>> [NETLINK]Interface:wlan0 Link:Up
+[2021-01-25 20:14:42]  [network] 669.433, ni_mon_thread.1471 >>> [NETLINK] receive event
+[2021-01-25 20:14:42]  [network] 669.433, read_netlink.1399 >>> [NETLINK],RTM_NEWLINK
+[2021-01-25 20:14:42]  [network] 669.433, _print_newlink_info.1287 >>> [NETLINK]Interface:wlan0 Link:Up
+[2021-01-25 20:14:42]  [network] 669.471, ni_mon_thread.1471 >>> [NETLINK] receive event
+[2021-01-25 20:14:42]  [network] 669.471, read_netlink.1399 >>> [NETLINK],RTM_NEWLINK
+[2021-01-25 20:14:42]  [network] 669.471, _print_newlink_info.1287 >>> [NETLINK]Interface:wlan0 Link:Up
+[2021-01-25 20:14:42]  [  669.597673] [atbm_log]:ieee80211_netdev_cmd_handle_default
+[2021-01-25 20:14:42]  [  669.619423] type=1400 audit(1611512113.495:789): avc: denied { connectto } for comm="HwBinder:339_2" path=002F646174612F6D6973632F626C756564726F69642F2E766F6963655F64617461 scontext=u:r:hal_audio_mstar:s0 tcontext=u:r:hidraw:s0 tclass=unix_stream_socket permissive=0
+[2021-01-25 20:14:42]  [  669.652511] type=1400 audit(1611512113.495:790): avc: denied { connectto } for comm="HwBinder:339_2" path=002F646174612F6D6973632F626C756564726F69642F2E766F6963655F6374726C scontext=u:r:hal_audio_mstar:s0 tcontext=u:r:hidraw:s0 tclass=unix_stream_socket permissive=0
+[2021-01-25 20:14:42]  [  669.690198] [atbm_log]:__ieee80211_start_scan(wlan0):work_list is not empty,pend scan
+[2021-01-25 20:14:42]  [  669.717307] [atbm_log]:ieee80211_netdev_cmd_handle_default
+[2021-01-25 20:14:42]  [  669.723530] [atbm_log]:ieee80211_netdev_cmd_handle_default
+[2021-01-25 20:14:42]  [  669.729757] [atbm_log]:ieee80211_netdev_cmd_handle_default
+[2021-01-25 20:14:42]  [network] 669.704, ni_mon_thread.1471 >>> [NETLINK] receive event
+[2021-01-25 20:14:42]  [network] 669.705, read_netlink.1408 >>> [NETLINK],RTM_NEWADDR
+[2021-01-25 20:14:42]  [  669.790237] [atbm_log]:ieee80211_netdev_cmd_handle_default
+[2021-01-25 20:14:42]  [  669.796651] [atbm_log]:ieee80211_netdev_cmd_handle_default
+[2021-01-25 20:14:42]  [  669.917918] [atbm_log]:ieee80211_netdev_cmd_handle_default
+[2021-01-25 20:14:43]  [  669.930280] [atbm_log]:[PM]:rev ind
+[2021-01-25 20:14:43]  [  669.933917] [atbm_log]:[PM]:up pm lock
+[2021-01-25 20:14:43]  [  669.997325] ion_alloc: len 8486912 heap_id_mask 1 flags 100000
+[2021-01-25 20:14:43]  [  670.024472] <MI3_ERR>_MI_OSD_MappingColorFmtMi2AfbcFmt[1146]: Cannot cast eColorFmt(7), use E_GOP_FB_AFBC_V1P2_ARGB8888 as default.
+[2021-01-25 20:14:43]  [  670.036833] [atbm_log]:ieee80211_scan_work:[wlan0] start pending scan
+[2021-01-25 20:14:43]  [  670.060271] [atbm_log]:atbm_hw_scan:if_id(0)
+[2021-01-25 20:14:43]  [  670.065325] [atbm_log]:atbm_hw_scan:scan, delay suspend
+[2021-01-25 20:14:43]  [  670.071374] [atbm_log]:scan start band(0),(14)
+[2021-01-25 20:14:43]  [NETLINK]NEWADDR ADDRESS=fe80::b6fb:e3ff:fe1c:5431/64 INTERFACE=wlan0 FLAGS=196 SCOPE=253
+[2021-01-25 20:14:43]  [network] 670.081, _print_addr_change_info.1367 >>> [NETLINK]PREFERRED=4294967295 VALID=4294967295 CSTAMP=66970 TSTAMP=66970
+[2021-01-25 20:14:43]  [network] 670.081, _net_ni_ip_chg_check.1199 >>> dev:    wifi0 old_ip: ,cur_ip 192.168.3.216
+[2021-01-25 20:14:43]  [network] 670.082, _net_ni_ip_chg_check.1199 >>> dev:    wifi0 old_ip: ,cur_ip 192.168.3.216
+[2021-01-25 20:14:43]  [network] 670.082, _net_ni_ip_chg_check.1199 >>> dev:    wifi0 old_ip: ,cur_ip 192.168.3.216
+[2021-01-25 20:14:43]  [network] 670.125, _net_get_dev_info.3711 >>> eth0->eth0, 2, 0x72ffda34
+[2021-01-25 20:14:43]  [  670.232176] type=1400 audit(1611512114.107:791): avc: denied { read } for comm="Binder:207_2" name="wakeup19" dev="sysfs" ino=24815 scontext=u:r:system_suspend:s0 tcontext=u:object_r:sysfs_devices_mstar_ehci:s0 tclass=dir permissive=0
+[2021-01-25 20:14:43]  [  670.369126] init: processing action (sys.sysctl.tcp_def_init_rwnd=*) from (/system/etc/init/hw/init.rc:1007)
+[2021-01-25 20:14:43]  [network] 670.405, _net_get_dev_info.3724 >>> get ip info error
+[2021-01-25 20:14:43]  [network] 670.405, _net_ip_info_print.290 >>> dev eth0 IP changed: 3
+[2021-01-25 20:14:43]  [network] 670.444, _net_ip_info_print.291 >>> Addr: 
+[2021-01-25 20:14:43]  [  670.616506] type=1400 audit(1611512114.491:792): avc: denied { search } for comm="pool-2-thread-1" name="Mstar-ehci-3" dev="sysfs" ino=3628 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs_devices_mstar_ehci:s0 tclass=dir permissive=0
+[2021-01-25 20:14:43]  [network] 670.684, _net_ip_info_print.294 >>> Mask: 0.0.0.0
+[2021-01-25 20:14:44]  [network] 670.684, _net_ip_info_print.297 >>> GWay: 
+[2021-01-25 20:14:44]  [network] 670.684, _net_ip_info_print.298 >>> DNS1: 
+[2021-01-25 20:14:44]  [network] 670.684, _net_ip_info_print.299 >>> DNS2: 
+[2021-01-25 20:14:44]  [NW]Received ni notify -> 3
+[2021-01-25 20:14:44]  [NW]Received ni notify -> 4
+[2021-01-25 20:14:44]  [network] 670.684, ni_mon_thread.1471 >>> [NETLINK] receive event
+[2021-01-25 20:14:44]  [network] 670.684, read_netlink.1408 >>> [NETLINK],RTM_NEWADDR
+[2021-01-25 20:14:44]  [NETLINK]NEWADDR ADDRESS=192.168.3.216/24 INTERFACE=wlan0 FLAGS=128 SCOPE=0
+[2021-01-25 20:14:44]  [network] 670.685, _print_addr_change_info.1367 >>> [NETLINK]PREFERRED=4294967295 VALID=4294967295 CSTAMP=66990 TSTAMP=66990
+[2021-01-25 20:14:44]  [NW]Handle the ni notify -> 3
+[2021-01-25 20:14:44]  [NW]change lock status function is _nw_ip_ni_notify_hdlr, line is 993
+[2021-01-25 20:14:44]  [network] 670.716, ni_mon_thread.1471 >>> [NETLINK] receive event
+[2021-01-25 20:14:44]  [network] 670.716, read_netlink.1408 >>> [NETLINK],RTM_NEWADDR
+[2021-01-25 20:14:44]  [NETLINK]NEWADDR ADDRESS=fe80::b6fb:e3ff:fe1c:5431/64 INTERFACE=wlan0 FLAGS=128 SCOPE=253
+[2021-01-25 20:14:44]  [network] 670.716, _print_addr_change_info.1367 >>> [NETLINK]PREFERRED=4294967295 VALID=4294967295 CSTAMP=66970 TSTAMP=66970
+[2021-01-25 20:14:44]  [NW_NOTIFY]NI_DRV_EV_IP_ADDRESS_CHANGED
+[2021-01-25 20:14:44]  [NW]!!!! Error the nw state.
+[2021-01-25 20:14:44]  [NW]change lock status function is _nw_ip_ni_notify_hdlr, line is 1076
+[2021-01-25 20:14:44]  [NW]Brdcast the msg  -> 3
+[2021-01-25 20:14:44]  [NW]Handle the ni notify -> 4
+[2021-01-25 20:14:44]  [NW]change lock status function is _nw_ip_ni_notify_hdlr, line is 993
+[2021-01-25 20:14:44]  [NW_NOTIFY]NI_DRV_EV_IP_ADDRESS_REL_CHANGED
+[2021-01-25 20:14:44]  [NW]change lock status function is _nw_ip_ni_notify_hdlr, line is 1076
+[2021-01-25 20:14:44]  [NW]Brdcast the msg  -> 4
+[2021-01-25 20:14:44]  [  670.875968] MApi_AudioAmp_ExtendCmd[1175]: Invalid params, _au32DeviceId[u8DeviceIndex]:0 != pstParams->u32DeviceId:255
+[2021-01-25 20:14:44]  [  670.887836] 
+[2021-01-25 20:14:44]  [  671.212920] [atbm_log]:hw_priv->scan.status 0
+[2021-01-25 20:14:44]  [  671.219249] [atbm_log]:atbm_scan_work:end(0)
+[2021-01-25 20:14:44]  [  671.224050] [atbm_log]:ieee80211_process_addba_request:mac[04:02:1f:55:52:c0],tid[0]
+[2021-01-25 20:14:44]  [network] 671.200, ni_mon_thread.1471 >>> [NETLINK] receive event
+[2021-01-25 20:14:44]  [network] 671.200, read_netlink.1399 >>> [NETLINK],RTM_NEWLINK
+[2021-01-25 20:14:44]  [network] 671.200, _print_n[  671.245875] [atbm_log]:ieee80211_process_addba_request:mac[04:02:1f:55:52:c0],tid[7]
+[2021-01-25 20:14:44]  ewlink_info.1287 >>> [NETLINK]Interface:wlan0 Link:Up
+[2021-01-25 20:14:44]  [  671.259855] Unable to handle kernel NULL pointer dereference at virtual address 00000010
+[2021-01-25 20:14:44]  [  671.268033] pgd = 49aebb32
+[2021-01-25 20:14:44]  [  671.270795] [00000010] *pgd=00000000
+[2021-01-25 20:14:44]  [  671.274452] Internal error: Oops: 5 [#1] PREEMPT SMP THUMB2
+[2021-01-25 20:14:44]  [  671.280030] Modules linked in: atbm_wifi rtk_btusb cfg80211 firmware_class devnode dtv_driver(O) mstar_fbdev_mi(O) mali_kbase(O) mdrv_tuner_si_2151 mik(O) misck(PO) mwgifker(PO) xcker(PO) hdcp2x(O) hdcp1x(O) utpa2k(O) kdrv_alg(PO) kdrv_xc(O) kdrv_platform(O) phy_ms_usb udc_msb250x ehci_hcd iniparser(O)
+[2021-01-25 20:14:44]  [  671.306841] CPU: 0 PID: 888 Comm: dialserver Tainted: P           O      4.19.116+ #1
+[2021-01-25 20:14:44]  [  671.314681] Hardware name: mt5867
+[2021-01-25 20:14:44]  [  671.318084] PC is at ieee80211_rx_irqsafe+0x63/0x99e [atbm_wifi]
+[2021-01-25 20:14:44]  [  671.324165] LR is at ieee80211_rx_irqsafe+0x7c2/0x99e [atbm_wifi]
+[2021-01-25 20:14:44]  [  671.330270] pc : [<de73828e>]    lr : [<de7389ed>]    psr: 200f0133
+[2021-01-25 20:14:44]  [  671.336548] sp : cec159f0  ip : 00000010  fp : 00000004
+[2021-01-25 20:14:45]  [  671.341784] r10: cec15a08  r9 : cec15a40  r8 : 00000005
+[2021-01-25 20:14:45]  [  671.347019] r7 : cec15a08  r6 : d8d43980  r5 : cf015d80  r4 : 00000004
+[2021-01-25 20:14:45]  [  671.353558] r3 : 00000000  r2 : cec15a08  r1 : 00000000  r0 : d8d43980
+[2021-01-25 20:14:45]  [  671.360099] Flags: nzCv  IRQs on  FIQs on  Mode SVC_32  ISA Thumb  Segment none
+[2021-01-25 20:14:45]  [  671.367420] Control: 50c0383d  Table: 3563c06a  DAC: 00000051
+[2021-01-25 20:14:45]  [  671.373180] Process dialserver (pid: 888, stack limit = 0x2059e99f)
+[2021-01-25 20:14:45]  [  671.379450] Stack: (0xcec159f0 to 0xcec16000)
+[2021-01-25 20:14:45]  [  671.383818] 59e0:                                     cec15a08 de7389ed d44ba040 00000000
+[2021-01-25 20:14:45]  [  671.392011] 5a00: 00000004 d8d43988 cec15a08 cec15a08 00000000 d44ba040 61ff39e2 c0f11400
+[2021-01-25 20:14:45]  [  671.400202] 5a20: 00000000 d90fc81e c0f11400 d90fc814 c0d211c8 d7c66480 cf015d80 de737fe1
+[2021-01-25 20:14:45]  [  671.408394] 5a40: cf015d80 d7c66480 d7098540 c0f11400 00000000 00000000 00000007 00000007
+[2021-01-25 20:14:45]  [  671.416586] 5a60: 00000000 00000000 61ff39e2 d7c66480 00000001 cf015d80 cec15aa0 00000000
+[2021-01-25 20:14:45]  [  671.424778] 5a80: cec15aa0 00000004 00000006 de72a807 da1d00fc d7c66624 d7c66630 00000001
+[2021-01-25 20:14:45]  [  671.432969] 5aa0: cec15aa0 cec15aa0 00000000 cec15aa8 61ff39e2 00000000 dd1982f8 d7c66614
+[2021-01-25 20:14:45]  [  671.441160] 5ac0: d7c66610 00000000 00000006 00000004 00000006 c01258fb c0d02098 00000100
+[2021-01-25 20:14:45]  [  671.449352] 5ae0: c0d02098 00000007 00000006 c0d02080 00000040 c010239b c0d06f68 c0d06f68
+[2021-01-25 20:14:45]  [  671.457544] 5b00: 00400101 fffe9578 00000009 c0c655c0 c0013800 cec15b70 00000001 c0c655a0
+[2021-01-25 20:14:45]  [  671.465727] 5b20: 00000000 dade6c80 da7fed00 c01254b1 00000000 c0164ca7 dd19fa00 cec15b70
+[2021-01-25 20:14:45]  [  671.473909] 5b40: c0d218e4 fd402000 c0d5e60c fd403000 cec14000 c03b5077 c03ab836 200f0133
+[2021-01-25 20:14:45]  [  671.482095] 5b60: ffffffff cec15ba4 ddfdf000 c0101ae5 ddfa12d8 00056ffc ddfbf000 cec15be4
+[2021-01-25 20:14:45]  [  671.490277] 5b80: 0001a61a 00000013 ddfc49ea ddfc4488 ddfdf000 00000002 dade6c80 da7fed00
+[2021-01-25 20:14:45]  [  671.498458] 5ba0: ddfc49e6 cec15bc4 ddfafba0 c03ab836 200f0133 ffffffff 00000051 bf000000
+[2021-01-25 20:14:45]  [  671.506639] 5bc0: 200f0133 00000d58 ddf9e000 d691de88 00000000 c0d211c8 da7fe280 c02ec5a5
+[2021-01-25 20:14:45]  [  671.514826] 5be0: c01552e5 00020000 61ff39e2 dade6c80 000001b8 da7fee04 c02ec511 00000012
+[2021-01-25 20:14:45]  [  671.523010] 5c00: d691de40 d691de40 00000012 c02ebe71 000001b8 00011ba0 da7fed00 00000000
+[2021-01-25 20:14:45]  [  671.531191] 5c20: 00000012 00011ba0 000001b8 00000e37 00000000 c02e99c1 00011ba0 da7fed00
+[2021-01-25 20:14:45]  [  671.539373] 5c40: c0e0fb00 00e251b8 00000000 da87d000 dade6c80 da7febdc da7febe0 da7feb80
+[2021-01-25 20:14:45]  [  671.547554] 5c60: da7febd8 da7feba0 da7febc0 00e251b8 00000000 c02e9ba3 00011ba0 da7febd0
+[2021-01-25 20:14:45]  [  671.555735] 5c80: da7fed00 da87d000 da7feba0 c02e9f73 00000000 cec15d28 da8557a0 da7a94c0
+[2021-01-25 20:14:45]  [  671.563916] 5ca0: 61ff39e2 00011ba0 00000000 dc5b005c 00e251b8 00000000 00011ba0 cec15db8
+[2021-01-25 20:14:45]  [  671.572103] 5cc0: c0d211c8 c02ebd8d 00011ba0 00011ba0 00000000 00020000 00e251b8 dc5b005c
+[2021-01-25 20:14:45]  [  671.580285] 5ce0: da436c38 c02eaa2f 00011ba0 00020000 00000001 00000018 0000000d 00020000
+[2021-01-25 20:14:45]  [  671.588466] 5d00: dc5b005c 00000800 dade6c80 d0e8000e 00000000 000000ce 02d5238a 00000000
+[2021-01-25 20:14:45]  [  671.596647] 5d20: c0d211c8 00000096 00011ba0 00000000 61ff39e2 dc5b0060 00000060 da436d3c
+[2021-01-25 20:14:45]  [  671.604828] 5d40: dc5b005c 00000100 006212c2 cec15db8 00000200 c01ed807 c0e10c00 d6f0e180
+[2021-01-25 20:14:45]  [  671.613010] 5d60: cec15d60 cec15d60 cec15d68 cec15d68 cec15d70 cec15d70 61ff39e2 000001ff
+[2021-01-25 20:14:45]  [  671.619548] type=1400 audit(1611512115.151:793): avc: denied { connectto } for comm="HwBinder:339_2" path=002F646174612F6D6973632F626C756564726F69642F2E766F6963655F64617461 scontext=u:r:hal_audio_mstar:s0 tcontext=u:r:hidraw:s0 tclass=unix_stream_socket permissive=0
+[2021-01-25 20:14:45]  [  671.621192] 5d80: 00000200 d128000e 000007df c0d211c8 dc869080 dc5d2f80 00000000 c01ed765
+[2021-01-25 20:14:45]  [  671.621197] 5da0: 006212c2 00000026 da436d3c d6f0e180 006212c2 da436d40 dc869080 dc5af934
+[2021-01-25 20:14:45]  [  671.621202] 5dc0: 61ff39e2 cec15e54 d6f0e180 d6f0e180 00000011 d6f0e180 0000002b da436c38
+[2021-01-25 20:14:45]  [  671.621207] 5de0: da436d3c c01e1295 00000080 da436d40 00000035 c01e17df 0000002b da436d3c
+[2021-01-25 20:14:45]  [  671.621215] 5e00: da436d3c cec15e54 00000035 d5422c60 00000026 cec14000 c0d211c8 00000054
+[2021-01-25 20:14:45]  [  671.645074] type=1400 audit(1611512115.151:794): avc: denied { connectto } for comm="HwBinder:339_2" path=002F646174612F6D6973632F626C756564726F69642F2E766F6963655F6374726C scontext=u:r:hal_audio_mstar:s0 tcontext=u:r:hidraw:s0 tclass=unix_stream_socket permissive=0
+[2021-01-25 20:14:45]  [  671.652942] 5e20: d5422c60 c020c8ad 00000026 00000000 00000035 d543ebc8 00000026 c020b8e9
+[2021-01-25 20:14:45]  [  671.652948] 5e40: 00000000 af265000 00000040 cec14000 af265000 d5422c60 00000054 006200c2
+[2021-01-25 20:14:45]  [  671.652953] 5e60: 0000002b af265000 d543ebc8 d543ebc8 00000000 00000000 00000000 00000000
+[2021-01-25 20:14:45]  [  671.652958] 5e80: 00000000 00000000 00000000 cec15ea8 61ff39e2 00000054 af265c00 af265c00
+[2021-01-25 20:14:45]  [  671.652967] 5ea0: 00000007 50c0387d cd3e6000 d5422c60 cec15fb0 c011129f c0d211c8 c0177687
+[2021-01-25 20:14:45]  [  671.652972] 5ec0: cec15f20 c079a5dd cec14000 00000000 d7ba203c 00000017 d7ba2000 00000017
+[2021-01-25 20:14:45]  [  671.758290] 5ee0: c0d2ae18 af265c00 00000007 50c0387d af265c00 c0d211c8 cec15fb0 c0110f33
+[2021-01-25 20:14:45]  [  671.766471] 5f00: 7fffffff af4b6028 ffffffff c0185eb7 c0d211c8 cec14000 cec15f20 00000001
+[2021-01-25 20:14:45]  [  671.774652] 5f20: cec15f1c 00000000 d7ba2000 00000000 af4b6000 00000028 61ff39e2 00000001
+[2021-01-25 20:14:45]  [  671.782833] 5f40: 00000081 af4a4e28 00000000 c0d211c8 7fffffff af4b6028 bec22d8c c0186a91
+[2021-01-25 20:14:45]  [  671.791014] 5f60: 00000000 00000000 ffffffff c0101224 cec14000 000000a2 bec22e34 c0177fdd
+[2021-01-25 20:14:45]  [  671.799195] 5f80: 00000001 61ff39e2 61ff39e2 af66c552 a00f0030 ffffffff 50c0383d 50c0387d
+[2021-01-25 20:14:45]  [  671.807376] 5fa0: af265c00 07f99db4 00000000 c0101e8f 07f870f0 af265c00 0000006c 0001afdc
+[2021-01-25 20:14:45]  [  671.815557] 5fc0: 07f870f0 00000000 af683908 00000002 af680360 af265c00 07f99db4 00000000
+[2021-01-25 20:14:45]  [  671.823738] 5fe0: ffffffff bec22668 af65b758 af66c552 a00f0030 ffffffff 00000000 00000000
+[2021-01-25 20:14:45]  [  671.832046] [<de73828e>] (ieee80211_rx_irqsafe [atbm_wifi]) from [<de7389ed>] (ieee80211_rx_irqsafe+0x7c2/0x99e [atbm_wifi])
+[2021-01-25 20:14:45]  [  671.843373] [<de7389ed>] (ieee80211_rx_irqsafe [atbm_wifi]) from [<de737fe1>] (ieee80211_rx+0x384/0x5ce [atbm_wifi])
+[2021-01-25 20:14:45]  [  671.854003] [<de737fe1>] (ieee80211_rx [atbm_wifi]) from [<de72a807>] (ieee80211_tasklet_handler+0xb4/0x1a8 [atbm_wifi])
+[2021-01-25 20:14:45]  [  671.864933] [<de72a807>] (ieee80211_tasklet_handler [atbm_wifi]) from [<c01258fb>] (tasklet_action_common+0x67/0x7c)
+[2021-01-25 20:14:45]  [  671.868708] init: starting service 'vendor.drm-playready-hal-1-3'...
+[2021-01-25 20:14:45]  [  671.875470] [<c01258fb>] (tasklet_action_common) from [<c010239b>] (__do_softirq+0x143/0x2ee)
+[2021-01-25 20:14:45]  [  671.875476] [<c010239b>] (__do_softirq) from [<c01254b1>] (irq_exit+0x77/0x78)
+[2021-01-25 20:14:45]  [  671.875485] [<c01254b1>] (irq_exit) from [<c0164ca7>] (__handle_domain_irq+0x81/0xd2)
+[2021-01-25 20:14:45]  [  671.875494] [<c0164ca7>] (__handle_domain_irq) from [<c03b5077>] (gic_handle_irq+0x51/0x78)
+[2021-01-25 20:14:45]  [  671.875502] [<c03b5077>] (gic_handle_irq) from [<c0101ae5>] (__irq_svc+0x65/0xac)
+[2021-01-25 20:14:46]  [  671.921261] Exception stack(0xcec15b70 to 0xcec15bb8)
+[2021-01-25 20:14:46]  [  671.926315] 5b60:                                     ddfa12d8 00056ffc ddfbf000 cec15be4
+[2021-01-25 20:14:46]  [  671.934496] 5b80: 0001a61a 00000013 ddfc49ea ddfc4488 ddfdf000 00000002 dade6c80 da7fed00
+[2021-01-25 20:14:46]  [  671.942678] 5ba0: ddfc49e6#1
+[2021-01-25 20:14:46]  [  672.128776] Hardware name: mt5867
+[2021-01-25 20:14:46]  [  672.132104] [<c010d431>] (unwind_backtrace) from [<c0109913>] (show_stack+0xb/0xc)
+[2021-01-25 20:14:46]  [  672.139681] [<c0109913>] (show_stack) from [<c0789391>] (dump_stack+0x5f/0x80)
+[2021-01-25 20:14:46]  [  672.146909] [<c0789391>] (dump_stack) from [<c010c5a9>] (ipi_cpu_stop+0x49/0x50)
+[2021-01-25 20:14:46]  [  672.154309] [<c010c5a9>] (ipi_cpu_stop) from [<c010c561>] (ipi_cpu_stop+0x1/0x50)
+[2021-01-25 20:14:46]  [  672.161799] [<c010c561>] (ipi_cpu_stop) from [<fd402000>] (0xfd402000)
+[2021-01-25 20:14:46]  [  672.168328] CPU2: stopping
+[2021-01-25 20:14:46]  [  672.171039] CPU: 2 PID: 0 Comm: swapper/2 Tainted: P      D    O      4.19.116+ #1
+[2021-01-25 20:14:46]  [  672.178610] Hardware name: mt5867
+[2021-01-25 20:14:46]  [  672.181931] [<c010d431>] (unwind_backtrace) from [<c0109913>] (show_stack+0xb/0xc)
+[2021-01-25 20:14:46]  [  672.189506] [<c0109913>] (show_stack) from [<c0789391>] (dump_stack+0x5f/0x80)
+[2021-01-25 20:14:46]  [  672.196734] [<c0789391>] (dump_stack) from [<c010c5a9>] (ipi_cpu_stop+0x49/0x50)
+[2021-01-25 20:14:46]  [  672.204135] [<c010c5a9>] (ipi_cpu_stop) from [<c010c561>] (ipi_cpu_stop+0x1/0x50)
+[2021-01-25 20:14:46]  [  672.211622] [<c010c561>] (ipi_cpu_stop) from [<fd402000>] (0xfd402000)
+[2021-01-25 20:14:46]  [  672.218151] CPU1: stopping
+[2021-01-25 20:14:46]  [  672.220862] CPU: 1 PID: 0 Comm: swapper/1 Tainted: P      D    O      4.19.116+ #1
+[2021-01-25 20:14:46]  [  672.228433] Hardware name: mt5867
+[2021-01-25 20:14:46]  [  672.231753] [<c010d431>] (unwind_backtrace) from [<c0109913>] (show_stack+0xb/0xc)
+[2021-01-25 20:14:46]  [  672.239328] [<c0109913>] (show_stack) from [<c0789391>] (dump_stack+0x5f/0x80)
+[2021-01-25 20:14:46]  [  672.246555] [<c0789391>] (dump_stack) from [<c010c5a9>] (ipi_cpu_stop+0x49/0x50)
+[2021-01-25 20:14:46]  [  672.253955] [<c010c5a9>] (ipi_cpu_stop) from [<c010c561>] (ipi_cpu_stop+0x1/0x50)
+[2021-01-25 20:14:46]  [  672.261441] [<c010c561>] (ipi_cpu_stop) from [<fd402000>] (0xfd402000)
+[2021-01-25 20:14:46]  [  672.267977] Rebooting in 5 seconds..
+[2021-01-25 20:14:46]  

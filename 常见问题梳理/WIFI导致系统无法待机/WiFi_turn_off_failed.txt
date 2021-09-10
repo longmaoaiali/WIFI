@@ -1,0 +1,753 @@
+
+console:/ $
+console:/ $
+console:/ $
+console:/ $ su
+/system/bin/sh: su: not found
+127|console:/ $
+127|console:/ $ xu
+1|console:/ $ xu 7411
+console:/ # echo 7 >/proc/sys/kernel/pri
+print-fatal-signals       printk_delay              printk_ratelimit
+printk                    printk_devkmsg            printk_ratelimit_burst
+console:/ # echo 7 >/proc/sys/kernel/printk
+printk                    printk_devkmsg            printk_ratelimit_burst
+printk_delay              printk_ratelimit
+console:/ # echo 7 >/proc/sys/kernel/printk
+console:/ #
+console:/ #
+console:/ # echo 7 >/proc/sys/kernel/printk
+console:/ # [  207.018479@1]-
+[  207.018479@1]- vdac_enable: 0, module_sel:0x1, private_flag:0x1
+[  207.020536@1]- atv_demod: atv_demod_leave_mode: OK.
+[  207.029335@1]- [mxl661] mxl661_release_ex OK.
+[  207.140994@0]- VID: VD1 set global output as 0
+[  207.145301@1]- VID: VD1 off
+[  207.146204@1]- tvin_afe: tvafe_open: open device
+[  207.147291@1]- tvin_afe: tvafe: device 0 release ok.
+[  207.152140@1]- tvin_afe: tvafe_dec_stop(0) decode havn't started
+[  207.179943@1]- amlvideo2_receiver_event_fun,6265stop thread
+[  207.180022@1]- DI: di_receiver_event_fun: unreg
+[  207.300310@1]- DI: provider name:(null)
+[  207.303807@1]- keep exit is di post
+[  207.303875@1]- video_vf_unreg_provider: vd1 used: true, vd2 used: false, keep_ret:2, black_out:0, cur_dispbuf:c1625c60
+[  207.328740@1]- di:no w
+[  207.349529@1]d video first pts = 0
+[  207.349598@1]- VD1 AFBC 0x0.
+[  207.352622@1]- pattern detected = 2, pts_enter_pattern_cnt =26, pts_exit_pattern_cnt =26[  207.383984@1]s DI: rel
+[  207.384009@1]s di:retry cnt=0
+[  207.384300@1]- DI: unreg f
+[  207.386659@1]- vdin0 provider: unreg
+[  207.390738@1]- di_cma_release:release 6 buffer use 8 ms(4294874628~4294874636)
+[  207.409399@1]- vdin0 codec cma release ok!
+[  207.409635@1]- resman release res [amvideo], proc:HwBinder:3136_3, (tgid:3136), (pid:3412)
+[  207.421375@0]- vdin0 event sm_sts:0x1 event:0x80000000
+[  207.431627@1]- lcd: lcd_set_vframe_rate_hint: return mode = 1080p60hz, policy = 1
+[  207.431643@1]- lcd: lcd_set_vframe_rate_hint: fr_mode is invalid, exit
+[  207.432475@1]- lcd: lcd_set_vframe_rate_hint: return mode = 1080p60hz, policy = 1
+[  207.432492@1]- lcd: lcd_set_vframe_rate_hint: fr_mode is invalid, exit
+[  207.542179@1]- tvin_afe: tvafe_dec_close begin to close afe.
+[  207.561147@1]- aml_fe_hook_cvd: reset OK.
+[  207.561267@1]- tvin_afe: [tvafe..] tvafe_cvd2_hold_rst.
+[  207.614171@1]-
+[  207.614171@1]- vdac_enable: 0, module_sel:0x1, private_flag:0x0
+[  207.617351@1]- vdac_enable: avout_atv is already off
+[  207.621763@1]- tvin_afe: tvafe_reset_module.
+[  207.640681@1]- tvin_afe: codec cma release ok!
+[  207.640756@1]- tvin_afe: tvafe_dec_close close afe ok.
+[  207.658981@1]- vdin_close_fe ok
+[  207.707305@1]- dtv_dmd:aml_dtvdm_set_property:l=UNDEFINED,c=ANALOG
+[  207.707880@1]- get_dtvpll_init_flag: 0
+[  207.717875@1]- [mxl661] mxl661_sleep_ex OK.
+[  207.717943@1]- get_dtvpll_init_flag: 0
+[  207.724840@1]- atv_demod: v4l2_frontend_shutdown: OK.
+[  207.725862@1]- VID: VD1 off
+[  207.734247@1]- DI: di_trig_free_mirror_mem
+[  207.768299@0]- di_cma_release:release 3 buffer use 0 ms(4294875012~4294875012)
+[  207.771174@0]- DI: release mirror
+[  212.209606@1]- type=1400 audit(1577836963.692:61): avc: denied { getattr } for pid=3113 comm="HwBinder:3113_1" path="/dev/__properties__/u:object_r:default_prop:s0" dev="tmpfs" ino=11349 scontext=u:r:hal_audio_default:s0 tcontext=u:object_r:default_prop:s0 tclass=file permissive=1
+[  212.243209@0]- type=1400 audit(1577837018.348:62): avc: denied { search } for pid=4454 comm="v.launcher.fall" name="net" dev="sysfs" ino=9272 scontext=u:r:untrusted_app:s0:c30,c256,c512,c768 tcontext=u:object_r:sysfs_net:s0 tclass=dir permissive=1
+[  212.293111@0]- type=1400 audit(1577837018.348:62): avc: denied { search } for pid=4454 comm="v.launcher.fall" name="net" dev="sysfs" ino=9272 scontext=u:r:untrusted_app:s0:c30,c256,c512,c768 tcontext=u:object_r:sysfs_net:s0 tclass=dir permissive=1
+[  212.376509@0]- type=1400 audit(1577837018.348:63): avc: denied { read } for pid=4454 comm="v.launcher.fall" name="address" dev="sysfs" ino=14743 scontext=u:r:untrusted_app:s0:c30,c256,c512,c768 tcontext=u:object_r:sysfs:s0 tclass=file permissive=1
+[  212.406910@0]- type=1400 audit(1577837018.348:63): avc: denied { read } for pid=4454 comm="v.launcher.fall" name="address" dev="sysfs" ino=14743 scontext=u:r:untrusted_app:s0:c30,c256,c512,c768 tcontext=u:object_r:sysfs:s0 tclass=file permissive=1
+[  212.426234@0]- type=1400 audit(1577837018.348:64): avc: denied { open } for pid=4454 comm="v.launcher.fall" path="/sys/devices/platform/ff3f0000.ethernet/net/eth0/address" dev="sysfs" ino=14743 scontext=u:r:untrusted_app:s0:c30,c256,c512,c768 tcontext=u:object_r:sysfs:s0 tclass=file permissive=1
+[  212.453951@0]- type=1400 audit(1577837018.348:64): avc: denied { open } for pid=4454 comm="v.launcher.fall" path="/sys/devices/platform/ff3f0000.ethernet/net/eth0/address" dev="sysfs" ino=14743 scontext=u:r:untrusted_app:s0:c30,c256,c512,c768 tcontext=u:object_r:sysfs:s0 tclass=file permissive=1
+[  212.476227@0]- type=1400 audit(1577837018.348:65): avc: denied { getattr } for pid=4454 comm="v.launcher.fall" path="/sys/devices/platform/ff3f0000.ethernet/net/eth0/address" dev="sysfs" ino=14743 scontext=u:r:untrusted_app:s0:c30,c256,c512,c768 tcontext=u:object_r:sysfs:s0 tclass=file permissive=1
+[  212.623864@1]- [atbm_log]:wlan0:free authen bss ++
+[  212.641236@1]- [atbm_log]:wlan0:free authen bss ++
+[  212.868722@1]- [atbm_log]:p2p0:free authen bss ++
+[  212.881269@1]- [atbm_log]:p2p0:free authen bss ++
+[  215.097624@0]- type=1400 audit(1577837018.348:65): avc: denied { getattr } for pid=4454 comm="v.launcher.fall" path="/sys/devices/platform/ff3f0000.ethernet/net/eth0/address" dev="sysfs" ino=14743 scontext=u:r:untrusted_app:s0:c30,c256,c512,c768 tcontext=u:object_r:sysfs:s0 tclass=file permissive=1
+[  215.160980@0]- type=1400 audit(1577837021.240:66): avc: denied { search } for pid=4454 comm="v.launcher.fall" name="net" dev="sysfs" ino=9272 scontext=u:r:untrusted_app:s0:c30,c256,c512,c768 tcontext=u:object_r:sysfs_net:s0 tclass=dir permissive=1
+[  215.384879@0]- IPv6: ADDRCONF(NETDEV_UP): p2p0: link is not ready
+[  215.763809@1]- [atbm_log]:atbm_hw_scan:if_id(0)
+[  215.764175@0]- [atbm_log]:atbm_hw_scan:scan, delay suspend
+[  215.768477@0]- [atbm_log]:scan start band(0),(14)
+[  216.827629@0]s [atbm_log]:hw_priv->scan.status 0
+[  216.827828@0]- [atbm_log]:atbm_scan_work:end(0)
+
+console:/ #
+console:/ # logcat -c
+console:/ # logcat -v threadtime >/data/wifi_sta_f[  235.785647@0]- [atbm_log]:atbm_hw_scan:if_id(0)
+[  235.786188@0]- [atbm_log]:atbm_hw_scan:scan, delay suspend
+[  235.790457@1]- [atbm_log]:scan start band(0),(14)
+ailed.[  236.841310@0]s [atbm_log]:hw_priv->scan.status 0
+[  236.841703@0]- [atbm_log]:atbm_scan_work:end(0)
+txt &
+[1] 4618
+console:/ # jobs
+[1] + Running              \logcat -v threadtime >/data/wifi_sta_failed.txt
+console:/ # [  242.763121@0]- video_global_output_store(0)
+[  243.315884@0]- [atbm_log]:wlan0:free authen bss ++
+[  243.359436@0]- watchdogd: watchdogd started (interval 10, margin 20)!
+[  243.363600@1]- [atbm_log]:wlan0:free authen bss ++
+[  243.366545@0]- meson_wdt ffd0f0d0.watchdog: start watchdog
+[  243.462647@0]- vdin0 close device vdin0 ok flags=0x0
+[  243.466623@0]- tvin_avin_detect: tvafe_avin_detect_disable
+[  243.539187@0]- meson_wdt ffd0f0d0.watchdog: set timeout
+
+143|console:/ # [  243.624161@0]- [atbm_log]:p2p0:free authen bss ++
+[  243.637708@0]- [atbm_log]:p2p0:free authen bss ++
+[  243.734543@1]- binder: send failed reply for transaction 53197 to 3307:3718
+[  243.876941@1]- libprocessgroup: Failed to kill process cgroup uid 0 pid 3108 in 224ms, 1 processes remain
+[  243.881880@0]- binder: undelivered TRANSACTION_COMPLETE
+[  243.886253@0]- binder: undelivered TRANSACTION_ERROR: 29189
+[  243.893429@0]- binder: undelivered death notification, 00000000a2714b80
+[  243.898419@0]- binder: undelivered TRANSACTION_COMPLETE
+[  243.904193@0]- binder: undelivered transaction 53203, process died.
+[  243.988529@1]- binder: 3023:3032 transaction failed 29189/-22, size 88-0 line 3121
+[  244.240711@1]- logd.writer: 35 output lines suppressed due to ratelimiting
+[  244.509915@0]- e2fsck: e2fsck 1.43.3 (04-Sep-2016)
+[  244.509915@0]-
+[  244.510897@0]- e2fsck: Pass 1: Checking inodes, blocks, and sizes
+[  244.510897@0]-
+[  244.518652@0]- e2fsck: Pass 2: Checking directory structure
+[  244.518652@0]-
+[  244.526127@0]- e2fsck: Pass 3: Checking directory connectivity
+[  244.526127@0]-
+[  244.533452@0]- e2fsck: Pass 4: Checking reference counts
+[  244.533452@0]-
+[  244.540986@0]- e2fsck: Pass 5: Checking group summary information
+[  244.540986@0]-
+[  244.548166@0]- e2fsck: factory: 50/8192 files (2.0% non-contiguous), 1811/8192 blocks
+[  244.548166@0]-
+[  244.617433@0]- e2fsck: e2fsck 1.43.3 (04-Sep-2016)
+[  244.617433@0]-
+[  244.618338@0]- e2fsck: Pass 1: Checking inodes, blocks, and sizes
+[  244.618338@0]-
+[  244.626387@0]- e2fsck: Pass 2: Checking directory structure
+[  244.626387@0]-
+[  245.273395@0]- [atbm_log]:atbm_reboot_notifier(3)
+[  245.273460@0]- [atbm_log]:wifi_tx_urb_pending(0)
+[  245.277041@0]- [atbm_log]:wifi_tx_urb_pending(0)
+[  245.282161@0]- [atbm_log]:atbm_wait_scan_complete_sync
+[  245.286930@0]- [atbm_log]:wsm_wait_pm_sync:complete
+[  245.291616@0]- [atbm_log]:HiHwCnfBufaddr  901ce2c
+[  245.296213@0]- [atbm_log]:atbm_usb_hw_write_port  0x87690121
+[  245.312184@0]- [atbm_log]:wait usb lmac rmmod ok !!!!!!!!
+[  245.312275@0]- [atbm_log]:atbm_usb_rmmod_sync loop  0!!!!!!!!
+[  245.318448@0]- xhci-hcd xhci-hcd.0.auto: remove, state 1
+[  245.323256@0]- usb usb2: USB disconnect, device number 1
+[  245.348958@1]d xhci-hcd xhci-hcd.0.auto: Host not halted after 16000 microseconds.
+[  245.350889@1]d xhci-hcd xhci-hcd.0.auto: Host controller not halted, aborting reset.
+[  245.358630@1]- xhci-hcd xhci-hcd.0.auto: USB bus 2 deregistered
+[  245.364534@1]- xhci-hcd xhci-hcd.0.auto: remove, state 1
+[  245.369792@1]- usb usb1: USB disconnect, device number 1
+[  245.374994@1]- usb 1-3: USB disconnect, device number 2
+[  245.380406@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.385918@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.391684@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.397460@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.403242@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.409019@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.414798@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.420580@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.426357@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.432134@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.437915@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.443693@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.449470@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.455252@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.461029@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.466806@1]d [atbm_log]:[WARNING] atbm_usb_receive_data drop
+[  245.472686@1]- [atbm_log]:atbm_usb_prepare_disconnect
+[  245.493244@1]- [atbm_log]:atbm_wait_scan_complete_sync
+[  245.493288@1]- [atbm_log]:wsm_wait_pm_sync:complete
+[  245.497672@1]- [atbm_log]: __atbm_usb_disconnect 3544 core cf4c9000
+[  245.503834@1]- [atbm_log]:atbm_unregister_common.++
+[  245.521385@1]- [atbm_log]:ieee80211_sdata_uninit:listen_sdata(  (null))
+[  245.545389@1]- [atbm_log]:ieee80211_sdata_uninit:listen_sdata(  (null))
+[  245.617438@1]- [atbm_log]:usb_atbm_bh BH thread break 364 1 0
+[  245.617591@1]- [atbm_log]:usb_atbm_bh 785
+[  245.621895@1]- [atbm_log]:atbm_wifi_BH_thread stop ++
+[  245.626822@1]- [atbm_log]:atbm_wifi_BH_thread stop --
+TXHD:BL1:6c4d9f:45932a;FEAT:E0FC318C:2000;POC:F;RCY:0;EMMC:0;READ:0;0.0;CHK:0;
+TE: 198330
+
+BL2 Built : 10:36:57, Dec 16 2020. txhd g17775de - jenkins@walle02-sh
+
+set vcck to 1050 mv
+enter pwm_set_voltage
+set vddee to 1050 mv
+enter pwm_set_voltage
+set vddee enable AO 2/10 to high
+ set test_n to high
+ Board ID = 12
+CPU clk: 1200MHz
+DQS-corr enabled
+DDR scramble enabled
+DDR3 chl: Rank0 16bit @ 912MHz
+
+
+bist_test rank: 0 1b 00 36 35 19 51 17 00 2f 37 22 4c 00 00 00 00 00 00 00 00 00 00 00 00 630   suspend
+ Set ddr ssc: ppm2000
+ pctl_resume
+
+Rank0: 512MB-2T-13
+DataBus test pass!
+AddrBus test pass!
+eMMC boot @ 0
+sw8 s
+storage init finish
+Load FIP HDR from eMMC, src: 0x0000c200, des: 0x01700000, size: 0x00004000, part: 0
+Load BL3x from eMMC, src: 0x00010200, des: 0x01704000, size: 0x000cce00, part: 0
+NOTICE:  BL31: v1.3(release):b8e7c16
+NOTICE:  BL31: Built : 18:58:24, Sep 30 2020
+NOTICE:  BL31: TXHD normal boot!
+NOTICE:  BL31: BL33 decompress pass
+OPS=0x12
+[Image: txhd_v1.1.3512-a86dfd3 2020-09-15 15:20:23 jenkins@walle02-sh]
+27 0b 12 00 27 59 5a 37 90 1b 51 cd 77 70 5d c7
+bl30:txhd thermal1
+[0.018760 Inits done]
+secure task start!
+high task start!
+low task start!
+ERROR:   Error initializing runtime service opteed_fast
+
+
+U-Boot 2015.01 (Jan 08 2021 - 17:24:32)
+
+DRAM:  512 MiB
+Relocation Offset is: 16e7f000
+mmu cfg end: 0x20000000
+mmu cfg end: 0x20000000
+aml pwm cal init
+aml pwm cal adc_val = 253, adc_voltage = 1045, def_voltage = 1050
+aml pwm cal adc_val = 253, adc_voltage = 1045, def_voltage = 1050
+aml pwm cal before ee_address: ff807004, ee_voltage: 40018
+aml pwm cal after ee_address: ff807004, ee_voltage: 40018
+aml board pwm vcck: 0, ee: 0
+register usb cfg[0][1] = 0000000017f71c30
+MMC:   aml_priv->desc_buf = 0x0000000013e6f590
+aml_priv->desc_buf = 0x0000000013e718d0
+SDIO Port B: 0, SDIO Port C: 1
+co-phase 0x3, tx-dly 0, clock 400000
+co-phase 0x3, tx-dly 0, clock 400000
+co-phase 0x3, tx-dly 0, clock 400000
+emmc/sd response timeout, cmd8, cmd->cmdarg=0x1aa, status=0x3ff2800
+emmc/sd response timeout, cmd55, cmd->cmdarg=0x0, status=0x3ff2800
+co-phase 0x3, tx-dly 0, clock 400000
+co-phase 0x3, tx-dly 0, clock 40000000
+init_part() 297: PART_TYPE_AML
+[mmc_init] mmc init success
+start dts,buffer=0000000013e74140,dt_addr=0000000013e74140
+get_partition_from_dts() 93: ret 0
+parts: 17
+00:      logo   0000000000800000 1
+01:  recovery   0000000001800000 1
+02:      misc   0000000000800000 1
+03:      dtbo   0000000000800000 1
+04:  cri_data   0000000000800000 2
+05:     param   0000000001000000 2
+06:      boot   0000000001000000 1
+set has_boot_slot = 0
+07:       rsv   0000000001000000 11
+08:  metadata   0000000001000000 1
+09:    vbmeta   0000000000200000 1
+10:       tee   0000000002000000 1
+11:    vendor   000000001c000000 1
+12:    system   0000000050000000 1
+13:   product   0000000002800000 1
+14:     cache   0000000008000000 2
+15:   factory   0000000002000000 2
+16:      data   ffffffffffffffff 4
+init_part() 297: PART_TYPE_AML
+eMMC/TSD partition table have been checked OK!
+crc32_s:0x1577dad == storage crc_pattern:0x1577dad!!!
+crc32_s:0xee152b83 == storage crc_pattern:0xee152b83!!!
+crc32_s:0x79f50f07 == storage crc_pattern:0x79f50f07!!!
+mmc env offset: 0xf400000
+In:    serial
+Out:   serial
+Err:   serial
+aml log : internal sys error!
+reboot_mode=cold_boot
+reboot_mode=cold_boot
+[store]To run cmd[emmc dtb_read 0x1000000 0x40000]
+_verify_dtb_checksum()-3354: calc ec876b53, store ec876b53
+_verify_dtb_checksum()-3354: calc ec876b53, store ec876b53
+dtb_read()-3569: total valid 2
+update_old_dtb()-3550: do nothing
+amlkey_init() enter!
+[EFUSE_MSG]keynum is 4
+power_key[i-1] =0x28d7f708
+power_key[i-1] =0xfe019088
+sendDataToFirmware, do_handle_multi_rc: data_buf[0] = 0x28D7F708
+sendDataToFirmware, do_handle_multi_rc: data_buf[1] = 0xFE019088
+command = 00400100
+command >> 16 = 00000040
+tx_size = 00000008
+insert ir wakeup key = 0x28d7f708
+insert ir wakeup key = 0xfe019088
+open file path = /factory/mkp/kp_0.tab ,funtion =parse_adc_keymap LINE=706
+key_name = power
+key_code = 116
+channel = 3
+value = 0
+tolerance = 100
+sendDataToFirmware, do_handle_multi_adc: data_buf[0] = 0x30640000
+command = 00410100
+command >> 16 = 00000041
+tx_size = 00000004
+insert adc wakeup key = 0x30640000
+vpu: clk_level in dts: 3
+vpu: vpu_power_on
+vpu: set clk: 250000000Hz, readback: 250000000Hz(0x101)
+vpu: vpu_module_init_config
+vpp: vpp_init
+E/    ini_platform:    splitFilePath, we need one abstract file path!!!  null.
+
+E/    model:    handle_tcon_bin, file name "null" not exist.
+
+lcd: lcd_debug_print flag: 0
+lcd: detect mode: tv, key_valid: 1
+lcd: load lcd_config from unifykey
+lcd: unifykey version: 0x0001
+lcd: load backlight_config from unifykey
+lcd: bl: unifykey version: 0x0001
+lcd: bl: pinctrl_version: 2
+lcd: bl: name: bl_pwm, method: 1
+lcd: bl: aml_bl_power_ctrl: 0
+Net:   sysnopsys gmac3.7
+dwmac.ff3f0000amlkey_init() enter!
+amlkey_init() 71: already init!
+[EFUSE_MSG]keynum is 4
+
+ramdump_init, add:0, size:0
+CONFIG_AVB2: null
+Start read misc partition datas!
+active slot = 0
+wipe_data=successful
+wipe_cache=successful
+check force update
+reboot_mode is cold_boot
+(Re)start USB...
+USB0:   USB3.0 XHCI init start
+Register 3000140 NbrPorts 3
+Starting the controller
+USB XHCI 1.00
+scanning bus 0 for devices... 2 USB Device(s) found
+       scanning usb for storage devices... 0 Storage Device(s) found
+-----------UPGRADEBIN_NAME : aml_upgrade_package.img , UPGRADEBIN_NAME_SOS : aml_upgrade_package_sos.img --------------
+** Bad device usb 0 **
+** Bad device usb 0 **
+** Bad device usb 0 **
+do_fat_exist ret = 0
+--------No valid upgrade package detected--------
+upgrade_step=2
+=======cvte_script_run===Per===
+<CVET-AT> [do_cvte_script_run] cvte_script=on
+cmd: fatexist usb 0 cvte_script_file.txt
+** Bad device usb 0 **
+do_fat_exist ret = 0
+is_fat_file_exist=0
+cmd: fatexist usb 1 cvte_script_file.txt
+** Bad device usb 1 **
+do_fat_exist ret = 0
+is_fat_file_exist=0
+cmd: fatexist usb 2 cvte_script_file.txt
+** Bad device usb 2 **
+do_fat_exist ret = 0
+is_fat_file_exist=0
+Failed to get file
+script file cvte_script_file.txt is not exit.
+cvte_script_run - run script file
+
+
+Usage:
+cvte_script_run  eg: cvte_script_run
+
+=======cvte_script_run===End===
+=======cvte_at===Per===
+
+<CVTE> do_cvte_at build 2019-7-12 11:17 [17:24:35]
+<CVET-AT> do_cvte_init_at_prama4env
+<CVET-AT> [do_cvt_facboot] reboot_mode=cold_boot ddr_training = <NULL>
+<CVET-AT> is AC Power
+** Bad device usb 0 **
+<AGING> [usb_file_check] rel=0
+<CVET-AT> CVTE_FAC_BOOT_FILE_NAME:FAC_BOOT_CVTE.cvt file_ret=0
+
+<CVET-AT> env AT_Read=0
+
+<CVET-AT> env AT_B=0
+
+<CVET-AT> env AT_B_2=0
+
+<CVET-AT> env AT_F=0
+
+<CVET-AT> env AT_T=0
+
+<CVET-AT> env AT_K=0
+
+<CVET-AT> env AT_WB=0
+
+<CVET-AT> env AT_Remote=0
+
+<CVET-AT> env AT_BOOTCH=0
+<CVET-AT> do_cvte2env AT_B:0, prama:0
+<CVET-AT> do_cvte2env AT_B_2:0, prama:0
+<CVET-AT> lab do_cvte2env AT_T:0
+<CVET-AT> lab do_cvte2env AT_F:0
+<CVET-AT> lab do_cvte2env AT_K:0
+<CVET-AT> lab do_cvte2env AT_READ:0
+Saving Environment to aml-storage...
+mmc env offset: 0xf400000
+Writing to MMC(1)... done
+
+<CVET-AT> init_at_mac AT_READ=0, AT_F=0
+<CVET-AT> is_at_mode AT_READ=0, AT_B=0, AT_T=0
+** Bad device usb 0 **
+<AGING> [usb_file_check] rel=0
+<CVET-AT> CVTE_MAKE_BIN_CFG_NAME:mk_bin.cfg file_ret=0
+** Bad device usb 0 **
+<AGING> [usb_file_check] rel=0
+** Bad device usb 0 **
+<AGING> [usb_file_check] rel=0
+=======cvte_at===End===
+this is for powermode_check when cold_boot
+--- mbx_chk_pwr ---
+gpio: pin GPIOAO_3 (gpio 3) value is 1
+bl31 reboot reason: 0x108
+bl31 reboot reason: 0x108
+system cmd  0.
+bl30 get wakeup sources!
+process command 00000006
+bl30 enter suspend!
+cpu clk suspend rate 1200000000
+store restore gp0 pll
+process command 00000001
+cec b ver:2018/08/10
+
+CEC cfg:0x0000
+set vddee to 0x0004mv
+08915c0000000000val2: 00000002
+set vddee to 0x0018mv
+set vcck to 0x0013mv
+exit_reason:0x02
+cfg15 3b00000
+cfg15 23b00000
+TXHD:BL1:6c4d9f:45932a;FEAT:E0FC318C:2000;POC:F;RCY:0;EMMC:0;READ:0;0.0;CHK:0;
+TE: 114125
+
+BL2 Built : 10:36:57, Dec 16 2020. txhd g17775de - jenkins@walle02-sh
+
+set vcck to 1050 mv
+enter pwm_set_voltage
+set vddee to 1050 mv
+enter pwm_set_voltage
+set vddee enable AO 2/10 to high
+ set test_n to high
+ Board ID = 12
+CPU clk: 1200MHz
+DQS-corr enabled
+DDR scramble enabled
+DDR3 chl: Rank0 16bit @ 912MHz
+
+
+bist_test rank: 0 1b 00 36 35 19 51 17 00 2f 37 22 4d 00 00 00 00 00 00 00 00 00 00 00 00 630   suspend
+ Set ddr ssc: ppm2000
+ pctl_resume
+
+Rank0: 512MB-2T-13
+DataBus test pass!
+AddrBus test pass!
+eMMC boot @ 0
+sw8 s
+storage init finish
+Load FIP HDR from eMMC, src: 0x0000c200, des: 0x01700000, size: 0x00004000, part: 0
+Load BL3x from eMMC, src: 0x00010200, des: 0x01704000, size: 0x000cce00, part: 0
+NOTICE:  BL31: v1.3(release):b8e7c16
+NOTICE:  BL31: Built : 18:58:24, Sep 30 2020
+NOTICE:  BL31: TXHD normal boot!
+NOTICE:  BL31: BL33 decompress pass
+OPS=0x12
+[Image: txhd_v1.1.3512-a86dfd3 2020-09-15 15:20:23 jenkins@walle02-sh]
+27 0b 12 00 27 59 5a 37 90 1b 51 cd 77 70 5d c7
+bl30:txhd thermal1
+[0.018752 Inits done]
+secure task start!
+high task start!
+low task start!
+ERROR:   Error initializing runtime service opteed_fast
+
+
+U-Boot 2015.01 (Jan 08 2021 - 17:24:32)
+
+DRAM:  512 MiB
+Relocation Offset is: 16e7f000
+mmu cfg end: 0x20000000
+mmu cfg end: 0x20000000
+aml pwm cal init
+aml pwm cal adc_val = 24f, adc_voltage = 1038, def_voltage = 1050
+aml pwm cal adc_val = 24c, adc_voltage = 1033, def_voltage = 1050
+aml pwm cal before ee_address: ff807004, ee_voltage: 40018
+aml pwm cal after ee_address: ff807004, ee_voltage: 30019
+aml board pwm vcck: 1, ee: 1
+register usb cfg[0][1] = 0000000017f71c30
+MMC:   aml_priv->desc_buf = 0x0000000013e6f590
+aml_priv->desc_buf = 0x0000000013e718d0
+SDIO Port B: 0, SDIO Port C: 1
+co-phase 0x3, tx-dly 0, clock 400000
+co-phase 0x3, tx-dly 0, clock 400000
+co-phase 0x3, tx-dly 0, clock 400000
+emmc/sd response timeout, cmd8, cmd->cmdarg=0x1aa, status=0x3ff2800
+emmc/sd response timeout, cmd55, cmd->cmdarg=0x0, status=0x3ff2800
+co-phase 0x3, tx-dly 0, clock 400000
+co-phase 0x3, tx-dly 0, clock 40000000
+init_part() 297: PART_TYPE_AML
+[mmc_init] mmc init success
+start dts,buffer=0000000013e74140,dt_addr=0000000013e74140
+get_partition_from_dts() 93: ret 0
+parts: 17
+00:      logo   0000000000800000 1
+01:  recovery   0000000001800000 1
+02:      misc   0000000000800000 1
+03:      dtbo   0000000000800000 1
+04:  cri_data   0000000000800000 2
+05:     param   0000000001000000 2
+06:      boot   0000000001000000 1
+set has_boot_slot = 0
+07:       rsv   0000000001000000 11
+08:  metadata   0000000001000000 1
+09:    vbmeta   0000000000200000 1
+10:       tee   0000000002000000 1
+11:    vendor   000000001c000000 1
+12:    system   0000000050000000 1
+13:   product   0000000002800000 1
+14:     cache   0000000008000000 2
+15:   factory   0000000002000000 2
+16:      data   ffffffffffffffff 4
+init_part() 297: PART_TYPE_AML
+eMMC/TSD partition table have been checked OK!
+crc32_s:0x1577dad == storage crc_pattern:0x1577dad!!!
+crc32_s:0xee152b83 == storage crc_pattern:0xee152b83!!!
+crc32_s:0x79f50f07 == storage crc_pattern:0x79f50f07!!!
+mmc env offset: 0xf400000
+In:    serial
+Out:   serial
+Err:   serial
+aml log : internal sys error!
+reboot_mode=shutdown_reboot
+reboot_mode=shutdown_reboot
+[store]To run cmd[emmc dtb_read 0x1000000 0x40000]
+_verify_dtb_checksum()-3354: calc ec876b53, store ec876b53
+_verify_dtb_checksum()-3354: calc ec876b53, store ec876b53
+dtb_read()-3569: total valid 2
+update_old_dtb()-3550: do nothing
+amlkey_init() enter!
+[EFUSE_MSG]keynum is 4
+power_key[i-1] =0x28d7f708
+power_key[i-1] =0xfe019088
+sendDataToFirmware, do_handle_multi_rc: data_buf[0] = 0x28D7F708
+sendDataToFirmware, do_handle_multi_rc: data_buf[1] = 0xFE019088
+command = 00400100
+command >> 16 = 00000040
+tx_size = 00000008
+insert ir wakeup key = 0x28d7f708
+insert ir wakeup key = 0xfe019088
+open file path = /factory/mkp/kp_0.tab ,funtion =parse_adc_keymap LINE=706
+key_name = power
+key_code = 116
+channel = 3
+value = 0
+tolerance = 100
+sendDataToFirmware, do_handle_multi_adc: data_buf[0] = 0x30640000
+command = 00410100
+command >> 16 = 00000041
+tx_size = 00000004
+insert adc wakeup key = 0x30640000
+vpu: clk_level in dts: 3
+vpu: vpu_power_on
+vpu: set clk: 250000000Hz, readback: 250000000Hz(0x101)
+vpu: vpu_module_init_config
+vpp: vpp_init
+E/    ini_platform:    splitFilePath, we need one abstract file path!!!  null.
+
+E/    model:    handle_tcon_bin, file name "null" not exist.
+
+lcd: lcd_debug_print flag: 0
+lcd: detect mode: tv, key_valid: 1
+lcd: load lcd_config from unifykey
+lcd: unifykey version: 0x0001
+lcd: load backlight_config from unifykey
+lcd: bl: unifykey version: 0x0001
+lcd: bl: pinctrl_version: 2
+lcd: bl: name: bl_pwm, method: 1
+lcd: bl: aml_bl_power_ctrl: 0
+Net:   sysnopsys gmac3.7
+dwmac.ff3f0000amlkey_init() enter!
+amlkey_init() 71: already init!
+[EFUSE_MSG]keynum is 4
+
+ramdump_init, add:0, size:0
+CONFIG_AVB2: null
+Start read misc partition datas!
+active slot = 0
+wipe_data=successful
+wipe_cache=successful
+check force update
+---no need update when not cold_boot---
+upgrade_step=2
+=======cvte_script_run===Per===
+<CVET-AT> [do_cvte_script_run] cvte_script=on
+cmd: fatexist usb 0 cvte_script_file.txt
+** Bad device usb 0 **
+do_fat_exist ret = 0
+is_fat_file_exist=0
+cmd: fatexist usb 1 cvte_script_file.txt
+** Bad device usb 1 **
+do_fat_exist ret = 0
+is_fat_file_exist=0
+cmd: fatexist usb 2 cvte_script_file.txt
+** Bad device usb 2 **
+do_fat_exist ret = 0
+is_fat_file_exist=0
+Failed to get file
+script file cvte_script_file.txt is not exit.
+cvte_script_run - run script file
+
+
+Usage:
+cvte_script_run  eg: cvte_script_run
+
+=======cvte_script_run===End===
+=======cvte_at===Per===
+
+<CVTE> do_cvte_at build 2019-7-12 11:17 [17:24:35]
+<CVET-AT> do_cvte_init_at_prama4env
+<CVET-AT> [do_cvt_facboot] reboot_mode=shutdown_reboot ddr_training = <NULL>
+
+<CVET-AT> env AT_Read=0
+
+<CVET-AT> env AT_B=0
+
+<CVET-AT> env AT_B_2=0
+
+<CVET-AT> env AT_F=0
+
+<CVET-AT> env AT_T=0
+
+<CVET-AT> env AT_K=0
+
+<CVET-AT> env AT_WB=0
+
+<CVET-AT> env AT_Remote=0
+
+<CVET-AT> env AT_BOOTCH=0
+<CVET-AT> do_cvte2env AT_B:0, prama:0
+<CVET-AT> do_cvte2env AT_B_2:0, prama:0
+<CVET-AT> lab do_cvte2env AT_T:0
+<CVET-AT> lab do_cvte2env AT_F:0
+<CVET-AT> lab do_cvte2env AT_K:0
+<CVET-AT> lab do_cvte2env AT_READ:0
+Saving Environment to aml-storage...
+mmc env offset: 0xf400000
+Writing to MMC(1)... done
+
+<CVET-AT> init_at_mac AT_READ=0, AT_F=0
+<CVET-AT> is_at_mode AT_READ=0, AT_B=0, AT_T=0
+** Bad device usb 0 **
+<AGING> [usb_file_check] rel=0
+<CVET-AT> CVTE_MAKE_BIN_CFG_NAME:mk_bin.cfg file_ret=0
+** Bad device usb 0 **
+<AGING> [usb_file_check] rel=0
+** Bad device usb 0 **
+<AGING> [usb_file_check] rel=0
+=======cvte_at===End===
+aml log : internal sys error!
+reboot_mode:::: shutdown_reboot
+==========do storeargs=====Start=====
+s_version: U-Boot 2015.01
+amlkey_init() enter!
+amlkey_init() 71: already init!
+[EFUSE_MSG]keynum is 4
+[KM]Error:f[key_manage_query_size]L515:key[usid] not programed yet
+now System MAC --> dc:bd:7a:36:52:0a
+[KM]Error:f[key_manage_query_size]L515:key[deviceid] not programed yet
+[KM]Error:f[key_manage_query_size]L515:key[oemkey] not programed yet
+<CVTE-AT> do_cvte_selinux
+<CVTE-AT> kernel log=off
+==========do storeargs=====End=====
+[OSD]load fb addr from dts:/meson-fb
+[OSD]set initrd_high: 0x1f800000
+[OSD]fb_addr for logo: 0x1f800000
+[OSD]load fb addr from dts:/meson-fb
+[OSD]fb_addr for logo: 0x1f800000
+[OSD]VPP_OFIFO_SIZE:0xfff0077f
+[CANVAS]canvas init
+[CANVAS]addr=0x1f800000 width=5760, height=2160
+[OSD]osd_hw.free_dst_data: 0,1919,0,1079
+vpp: vpp_matrix_update: 0
+lcd: enable: GENERAL_1920_1080, lvds, 1920x1080@60. 0Hz
+lcd: tv driver init(ver 20201027): lvds
+lcd: lcd_pll_wait_lock: pll_lock=1, wait_loop=1
+lcd: set pll spread spectrum: 3, +/-1.0%
+vpp: vpp_init_lcd_gamma_table
+lcd: bl: set level: 255, last level: 0
+lcd: bl: aml_bl_power_ctrl: 1
+lcd: clear mute
+==========do storeargs=====Start=====
+s_version: U-Boot 2015.01
+amlkey_init() enter!
+amlkey_init() 71: already init!
+[EFUSE_MSG]keynum is 4
+[KM]Error:f[key_manage_query_size]L515:key[usid] not programed yet
+now System MAC --> dc:bd:7a:36:52:0a
+[KM]Error:f[key_manage_query_size]L515:key[deviceid] not programed yet
+[KM]Error:f[key_manage_query_size]L515:key[oemkey] not programed yet
+<CVTE-AT> do_cvte_selinux
+<CVTE-AT> kernel log=off
+==========do storeargs=====End=====
+Command: bcb uboot-command
+Start read misc partition datas!
+BCB hasn't any datas,exit!
+Hit Enter or space or Ctrl+C key to stop autoboot -- :  0
+CONFIG_SYSTEM_AS_ROOT: systemroot
+system_mode: 1
+Start read misc partition datas!
+active slot = 0
+CONFIG_AVB2: null
+active_slot: normal
+avb2: 0
+ee_gate_off ...
+avb2: 0
+## Booting Android Image at 0x01080000 ...
+Kernel command line: androidboot.dtbo_idx=0 --cmdline root=/dev/mmcblk0p17 buildvariant=userdebug
+[store]Is good fdt check header, no need decrypt!
+active_slot is normal
+load dtb from 0x1000000 ......
+find 1 dtbos
+dtbos to be applied: 0
+Apply dtbo 0
+   Loading Kernel Image(COMP_NONE) ... OK
+   kernel loaded at 0x01080000, end = 0x01898850
+   Loading Device Tree to 0000000009fe9000, end 0000000009fff9b5 ... OK
+fdt_fixup_memory_banks, reg:0000000000000000
+
+Starting kernel ...
+
+uboot time: 2920218 us
+domain-0 init dvfs: 4
+console:/ $

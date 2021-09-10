@@ -1,0 +1,48 @@
+From ecee704dd605fb2861f9af6df44e1f7d991bcb6d Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Sat, 30 Jan 2021 13:00:58 +0800
+Subject: [PATCH] [bugfix][JIRA#PT200027-745][WiFi@ATBM60X2][common]system rebooot when wifi connected
+
+[what]system rebooot when wifi connected
+[why]null point in rx handle pkg
+[how]modify kernel compile use mac80211
+
+Change-Id: I9098022675c3e6814abe3692143fcba8363fb50d
+---
+
+diff --git a/kernel/fusion/4.19/drivers/net/wireless/atbm/atbm60X2/hal_apollo/mac80211/main.c b/kernel/fusion/4.19/drivers/net/wireless/atbm/atbm60X2/hal_apollo/mac80211/main.c
+index 0e91f9e..6f66162 100644
+--- a/kernel/fusion/4.19/drivers/net/wireless/atbm/atbm60X2/hal_apollo/mac80211/main.c
++++ b/kernel/fusion/4.19/drivers/net/wireless/atbm/atbm60X2/hal_apollo/mac80211/main.c
+@@ -1584,8 +1584,8 @@
+ 	local->hw.queues = 1;
+ 	local->hw.max_rates = 1;
+ 	local->hw.max_report_rates = 0;
+-	local->hw.max_rx_aggregation_subframes = IEEE80211_MAX_AMPDU_BUF;
+-	local->hw.max_tx_aggregation_subframes = IEEE80211_MAX_AMPDU_BUF;
++	local->hw.max_rx_aggregation_subframes = 64;
++	local->hw.max_tx_aggregation_subframes = 64;
+ 	local->hw.offchannel_tx_hw_queue = IEEE80211_INVAL_HW_QUEUE;
+ 	local->user_power_level = -1;
+ 	local->uapsd_queues = IEEE80211_DEFAULT_UAPSD_QUEUES;
+diff --git a/kernel/fusion/4.19/drivers/net/wireless/atbm/atbm60X2/hal_apollo/mac80211/rx.c b/kernel/fusion/4.19/drivers/net/wireless/atbm/atbm60X2/hal_apollo/mac80211/rx.c
+old mode 100644
+new mode 100755
+index 3a31ebe..ef42d5a
+--- a/kernel/fusion/4.19/drivers/net/wireless/atbm/atbm60X2/hal_apollo/mac80211/rx.c
++++ b/kernel/fusion/4.19/drivers/net/wireless/atbm/atbm60X2/hal_apollo/mac80211/rx.c
+@@ -2257,7 +2257,13 @@
+ 			memset(skb->cb, 0, sizeof(skb->cb));
+ 			//extern void frame_hexdump(char *prefix, u8 *data, int len);
+ 			//frame_hexdump("netif_receive_skb1 ",skb->data,64);
+-			atbm_netif_receive_skb(skb);
++			if(skb->protocol == htons(ETH_P_IPV6)){
++				atbm_printk_always("zezer:drop ipv6----------\n");
++				atbm_dev_kfree_skb(skb);
++				skb = NULL;
++			}else{
++				atbm_netif_receive_skb(skb);
++			}
+ 		}
+ 	}
+ 

@@ -1,0 +1,16 @@
+kernel_panic.log 可以看见 收包异常导致的panic ieee80211_rx_irqsafe 
+(ieee80211_rx_irqsafe [atbm_wifi]) from [<de7389ed>] (ieee80211_rx_irqsafe+0x7c2/0x99e [atbm_wifi])
+(ieee80211_rx_irqsafe [atbm_wifi]) from [<de737fe1>] (ieee80211_rx+0x384/0x5ce [atbm_wifi])
+(ieee80211_rx [atbm_wifi]) from [<de72a807>] (ieee80211_tasklet_handler+0xb4/0x1a8 [atbm_wifi])
+(ieee80211_tasklet_handler [atbm_wifi]) from [<c01258fb>] (tasklet_action_common+0x67/0x7c)
+(tasklet_action_common) from [<c010239b>] (__do_softirq+0x143/0x2ee)
+(__do_softirq) from [<c01254b1>] (irq_exit+0x77/0x78)
+(irq_exit) from [<c0164ca7>] (__handle_domain_irq+0x81/0xd2)
+(__handle_domain_irq) from [<c03b5077>] (gic_handle_irq+0x51/0x78)
+(gic_handle_irq) from [<c0101ae5>] (__irq_svc+0x65/0xac)
+
+objdump 反汇编 vmlinux
+arm-linux-objdump -S -l -z vmlinux > vmlinux.txt
+
+（1）kernel 4.19 ampdu 长度编码0x400，4.9 kernel 版本为0x100，驱动申请长度为u8，导致申请ampdu大小异常。造成连接WiFi处理ampdu数据包异常重启。
+（2）kernel 4.19 处理ipv6数据包需要做8字节对齐，如小于8字节对齐，会导致在kernel处理ipv6地址计算时指令异常报错。导致kernel panic。该问题暂做对齐处理。
