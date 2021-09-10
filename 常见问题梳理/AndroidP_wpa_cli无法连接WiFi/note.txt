@@ -1,0 +1,1 @@
+framework send disconnect when wpa_cli command connect wifi

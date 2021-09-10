@@ -1,0 +1,118 @@
+From 046876f3eeed2a5a4158ff4ee3cc80b2fbb8b563 Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Fri, 05 Jun 2020 14:14:49 +0800
+Subject: [PATCH] [bugfix][JIRA#WIFI_SWAT-99][WiFi][common]resolve framework send disconnect when wpa_cli command connect wifi
+
+[what]wpa_cli can not connect wifi network debug
+[why]framework send disconnect when wpa_cli command connect wifi
+[how]implementation framework supports wpa_cli to connect WiFi method
+
+Change-Id: I654d47a35e656b503feaa248e47b83e1e1d90d31
+---
+
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStaIfaceHal.java b/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStaIfaceHal.java
+old mode 100644
+new mode 100755
+index b3cb8ef..98b5455
+--- a/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStaIfaceHal.java
++++ b/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStaIfaceHal.java
+@@ -2353,13 +2353,26 @@
+                 com.mediatek.server.wifi.MtkGbkSsid.checkAndSetGbk(wifiSsid);
+                 String bssidStr = NativeUtil.macAddressFromByteArray(bssid);
+                 mStateIsFourway = (newState == ISupplicantStaIfaceCallback.State.FOURWAY_HANDSHAKE);
+-                if (newSupplicantState == SupplicantState.COMPLETED) {
+-                    mWifiMonitor.broadcastNetworkConnectionEvent(
+-                            mIfaceName, getCurrentNetworkId(mIfaceName), bssidStr);
++                //CVTE ADD for resolve framework send disconnect when wpa_cli command connect wifi.
++                if (getCurrentNetworkId(mIfaceName) != WifiConfiguration.INVALID_NETWORK_ID) {
++                    id = getCurrentNetworkId(mIfaceName);
+                 }
++                //CVTE END
++                if (newSupplicantState == SupplicantState.COMPLETED) {
++                    //CVTE MODIFY for resolve framework send disconnect when wpa_cli command connect wifi.
++                    //mWifiMonitor.broadcastNetworkConnectionEvent(
++                            //mIfaceName, getCurrentNetworkId(mIfaceName), bssidStr);
++                    mWifiMonitor.broadcastNetworkConnectionEvent(
++                            mIfaceName, id, bssidStr);
++                    //CVTE END
++                }
++                //CVTE MODIFY for resolve framework send disconnect when wpa_cli command connect wifi.
++                //mWifiMonitor.broadcastSupplicantStateChangeEvent(
++                        //mIfaceName, getCurrentNetworkId(mIfaceName), wifiSsid,
++                        //bssidStr, newSupplicantState);
+                 mWifiMonitor.broadcastSupplicantStateChangeEvent(
+-                        mIfaceName, getCurrentNetworkId(mIfaceName), wifiSsid,
+-                        bssidStr, newSupplicantState);
++                        mIfaceName, id, wifiSsid, bssidStr, newSupplicantState);
++                //CVTE END
+             }
+         }
+ 
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigManager.java b/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigManager.java
+index 09d75a4..f322dca 100755
+--- a/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigManager.java
++++ b/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigManager.java
+@@ -3004,4 +3004,15 @@
+         }
+         config.recentFailure.clear();
+     }
++
++    //CVTE ADD for resolve framework send disconnect when wpa_cli command connect wifi.
++    public void addConfigToConfiguredNetworks(WifiConfiguration config) {
++        try {
++            Log.e(TAG,"wpa_cli addConfigToConfiguredNetworks");
++            mConfiguredNetworks.put(config);
++        } catch (IllegalArgumentException e) {
++            Log.e(TAG, "Failed to add network to config map", e);
++        }
++    }
++    //CVTE END
+ }
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java b/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
+index 6515238..61323b2 100755
+--- a/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
++++ b/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
+@@ -4392,7 +4392,26 @@
+                         }
+                         sendNetworkStateChangeBroadcast(mLastBssid);
+                         transitionTo(mObtainingIpState);
+-                    } else {
++                    }
++                    //CVTE ADD for resolve framework send disconnect when wpa_cli command connect wifi.
++                    else if (mLastNetworkId != WifiConfiguration.INVALID_NETWORK_ID) {
++                        Log.e(TAG,"wpa_cli command connected wifi mLastNetworkId = " + mLastNetworkId);
++                        WifiConfiguration tmpConfig = new WifiConfiguration();
++                        tmpConfig.networkId = mLastNetworkId;
++                        tmpConfig.BSSID = mLastBssid;
++                        mWifiConfigManager.addConfigToConfiguredNetworks(tmpConfig);
++                        mWifiInfo.setBSSID(mLastBssid);
++                        mWifiInfo.setNetworkId(mLastNetworkId);
++                        mWifiInfo.setMacAddress(mWifiNative.getMacAddress(mInterfaceName));
++
++                        mWifiConnectivityManager.trackBssid(mLastBssid, true, reasonCode);
++
++                        mWifiConfigManager.addOrUpdateNetwork(tmpConfig, Process.WIFI_UID);
++                        sendNetworkStateChangeBroadcast(mLastBssid);
++                        transitionTo(mObtainingIpState);
++                    }
++                    //END
++                    else {
+                         logw("Connected to unknown networkId " + mLastNetworkId
+                                 + ", disconnecting...");
+                         sendMessage(CMD_DISCONNECT);
+@@ -5026,7 +5045,14 @@
+     class ObtainingIpState extends State {
+         @Override
+         public void enter() {
+-            final WifiConfiguration currentConfig = getCurrentWifiConfiguration();
++            //CVTE MODIFY for resolve framework send disconnect when wpa_cli command connect wifi.
++            //final WifiConfiguration currentConfig = getCurrentWifiConfiguration();
++            WifiConfiguration currentConfig = getCurrentWifiConfiguration();
++            if(currentConfig == null) {
++                currentConfig = new WifiConfiguration();
++                Log.e(TAG,"ObtainingIpState enter currentconfig = null");
++            }
++            //CVTE END
+             final boolean isUsingStaticIp =
+                     (currentConfig.getIpAssignment() == IpConfiguration.IpAssignment.STATIC);
+             if (mVerboseLoggingEnabled) {

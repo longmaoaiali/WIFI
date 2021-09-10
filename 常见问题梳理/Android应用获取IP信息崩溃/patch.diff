@@ -1,0 +1,36 @@
+From 418d44ab596d8c6302b2828518b88969184f2490 Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Fri, 14 Aug 2020 16:26:41 +0800
+Subject: [PATCH] [merge][cp-from@7bf35a7][bugfix][JIRA#MD200110-19][WiFi][common]resolve to get staticIpConfiguration is null when get ip
+
+[what]resolve to get staticIpConfiguration is null when get ip
+[why]set config get staticIpConfiguration is null
+[how]add judge staticIpConfiguration is null and return IpInfo
+
+Change-Id: I9875918c428d3b7f30b3987a0dc49855a9243b1c
+---
+
+diff --git a/cvte/android-system-adapter/platform/android28/com/cvte/adapter/android/net/WifiManagerAdapter.java b/cvte/android-system-adapter/platform/android28/com/cvte/adapter/android/net/WifiManagerAdapter.java
+index b488247..2916308 100755
+--- a/cvte/android-system-adapter/platform/android28/com/cvte/adapter/android/net/WifiManagerAdapter.java
++++ b/cvte/android-system-adapter/platform/android28/com/cvte/adapter/android/net/WifiManagerAdapter.java
+@@ -225,6 +225,9 @@
+     public IpInfo getIpInfo(WifiConfiguration config) {
+         IpInfo info = new IpInfo();
+         StaticIpConfiguration staticIpConfiguration = config.getStaticIpConfiguration();
++        if(staticIpConfiguration == null) {
++            return info;
++        }
+         if(staticIpConfiguration.ipAddress != null &&
+                 staticIpConfiguration.ipAddress.getAddress() != null) {
+             info.ipAddress = staticIpConfiguration.ipAddress.getAddress().getAddress();
+@@ -246,6 +249,9 @@
+         IpInfo info = new IpInfo();
+         WifiConfiguration config = mWifiManager.getWifiApConfiguration();
+         StaticIpConfiguration staticIpConfiguration = config.getStaticIpConfiguration();
++        if(staticIpConfiguration == null) {
++            return info;
++        }
+         if(staticIpConfiguration.ipAddress != null &&
+                 staticIpConfiguration.ipAddress.getAddress() != null) {
+             info.ipAddress = staticIpConfiguration.ipAddress.getAddress().getAddress();

@@ -1,0 +1,91 @@
+From fb40c96ea415100301e764072254164d10f481f9 Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Mon, 17 Aug 2020 20:21:33 +0800
+Subject: [PATCH] [merge][cp-from@75c48411][feature][JIRA#MD200110-21][WiFi][only]add acquire wifi network ip info for customer
+
+[what]add acquire wifi network ip info for customer
+[why]add acquire wifi network ip info for customer
+[how]add acquire wifi network ip info for customer
+
+Change-Id: I1e75739682dcb5fca7c35e75a569544b14c23c4c
+---
+
+diff --git a/cvte/android-system-adapter/platform/android28/com/cvte/adapter/android/net/WifiManagerAdapter.java b/cvte/android-system-adapter/platform/android28/com/cvte/adapter/android/net/WifiManagerAdapter.java
+index 2916308..6616f9f 100755
+--- a/cvte/android-system-adapter/platform/android28/com/cvte/adapter/android/net/WifiManagerAdapter.java
++++ b/cvte/android-system-adapter/platform/android28/com/cvte/adapter/android/net/WifiManagerAdapter.java
+@@ -55,7 +55,7 @@
+      * unable to service the request
+      */
+     public static final int BUSY                        = 2;
+-
++    public final int DNS_NUMBER = 2;
+     /**
+      * Wifi tethering type.
+      */
+@@ -202,26 +202,52 @@
+         return false;
+     }
+ 
++    //CVTE MODIFY for acquire wifi network ip info
++    /*@Override
++     *public IpInfo getIpInfo() {
++     *   Log.d("getIpInfo","enter getIpInfo");
++     *   IpInfo info = new IpInfo();
++     *   LinkProperties linkProperties = new LinkProperties();
++     *   DhcpInfo mDhcpInfo = mWifiManager.getDhcpInfo();
++     *   info.ipAddress = NetworkUtils.int2byte(mDhcpInfo.ipAddress);
++     *   Log.d("getIpInfo","info.ipAddress ===== "+info.ipAddress);
++     *   info.netmask = NetworkUtils.int2byte(mDhcpInfo.netmask);
++     *   info.gateway = NetworkUtils.int2byte(mDhcpInfo.gateway);
++     *   if (linkProperties.getDnsServers().size() > 0) {
++     *       info.dns = new ArrayList<byte[]>();
++     *       Iterator<InetAddress> it = linkProperties.getDnsServers().iterator();
++     *       while (it.hasNext()) {
++     *           info.dns.add(it.next().getAddress());
++     *       }
++     *   }
++     *   return info;
++     *}
++     */
++
+     @Override
+     public IpInfo getIpInfo() {
+-        Log.d("getIpInfo","enter getIpInfo");
+         IpInfo info = new IpInfo();
+-        LinkProperties linkProperties = new LinkProperties();
+-        DhcpInfo mDhcpInfo = mWifiManager.getDhcpInfo();
+-        info.ipAddress = NetworkUtils.int2byte(mDhcpInfo.ipAddress);
+-        Log.d("getIpInfo","info.ipAddress ===== "+info.ipAddress);
+-        info.netmask = NetworkUtils.int2byte(mDhcpInfo.netmask);
+-        info.gateway = NetworkUtils.int2byte(mDhcpInfo.gateway);
+-        if (linkProperties.getDnsServers().size() > 0) {
+-            info.dns = new ArrayList<byte[]>();
+-            Iterator<InetAddress> it = linkProperties.getDnsServers().iterator();
+-            while (it.hasNext()) {
+-                info.dns.add(it.next().getAddress());
+-            }
++        DhcpInfo dhcpInfo = mWifiManager.getDhcpInfo();
++        if(dhcpInfo != null) {
++            info.ipAddress = NetworkUtils.int2byte(dhcpInfo.ipAddress);
++            info.gateway = NetworkUtils.int2byte(dhcpInfo.gateway);
++            dhcpInfo.netmask = getNetworkMask(info.ipAddress);
++            info.netmask = NetworkUtils.int2byte(dhcpInfo.netmask);
++            info.dns = new ArrayList<byte[]>(DNS_NUMBER);
++            info.dns.add(NetworkUtils.int2byte(dhcpInfo.dns1));
++            info.dns.add(NetworkUtils.int2byte(dhcpInfo.dns2));
+         }
+         return info;
+     }
+ 
++    private int getNetworkMask(byte[] networkIp) {
++        String ipAddr = NetworkUtils.byte2string(networkIp);
++        Inet4Address inetAddr = getIPv4Address(ipAddr);
++        int maskPrefixLength = android.net.NetworkUtils.getImplicitNetmask(inetAddr);
++        return android.net.NetworkUtils.prefixLengthToNetmaskInt(maskPrefixLength);
++    }
++    //CVTE MODIFY END
++
+     public IpInfo getIpInfo(WifiConfiguration config) {
+         IpInfo info = new IpInfo();
+         StaticIpConfiguration staticIpConfiguration = config.getStaticIpConfiguration();
