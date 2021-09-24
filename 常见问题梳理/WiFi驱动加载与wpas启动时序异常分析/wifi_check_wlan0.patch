@@ -1,0 +1,60 @@
+diff --git a/opt/net/wifi/libwifi_hal/include/hardware_legacy/wifi.h b/opt/net/wifi/libwifi_hal/include/hardware_legacy/wifi.h
+index dcc9fe6..4b16f34 100755
+--- a/opt/net/wifi/libwifi_hal/include/hardware_legacy/wifi.h
++++ b/opt/net/wifi/libwifi_hal/include/hardware_legacy/wifi.h
+@@ -59,6 +59,8 @@ typedef struct {
+  * @return device ID on success, -1 on failure.
+  */
+ int wifi_get_device_id();
++
++void wifi_check_insmod_succuss();
+ /**
+  * Load the Wi-Fi driver.
+  *
+diff --git a/opt/net/wifi/libwifi_hal/wifi_hal_common.cpp b/opt/net/wifi/libwifi_hal/wifi_hal_common.cpp
+index b99ca91..f7e3210 100755
+--- a/opt/net/wifi/libwifi_hal/wifi_hal_common.cpp
++++ b/opt/net/wifi/libwifi_hal/wifi_hal_common.cpp
+@@ -253,7 +253,7 @@ int wifi_load_driver() {
+          mode_drivers[device_id].modules[i].module_arg) < 0)
+       return -1;
+   }
+-
++  wifi_check_insmod_succuss();
+ #ifdef WIFI_DRIVER_STATE_CTRL_PARAM
+   if (is_wifi_driver_loaded()) {
+     return 0;
+@@ -265,6 +265,33 @@ int wifi_load_driver() {
+   return 0;
+ }
+ 
++void wifi_check_insmod_succuss() {
++  char buf[200] = {0};
++  FILE *profs_entry = NULL;
++  int try_time = 0;
++  do {
++    profs_entry = fopen("/proc/net/wireless", "r");
++    if(profs_entry == NULL) {
++      PLOG(ERROR) << "open /proc/net/wireless failed!";
++      break;
++    }
++    if( 0 == fread(buf, 200, 1, profs_entry) ){
++      PLOG(ERROR) << "faied to read proc/net/wireless";
++    }
++    if(NULL != strstr(buf, "wlan0")) {
++      PLOG(ERROR) << "insmod ok,try_time(%d)", try_time;
++      fclose(profs_entry);
++      profs_entry = NULL;
++      break;
++    } else {
++      PLOG(ERROR) << "initial,try_time(%d)",try_time;
++    }
++    fclose(profs_entry);
++    profs_entry = NULL;
++    usleep(200000);
++  } while (try_time++ < 10);
++}
++
+ int wifi_unload_driver() {
+   if (!is_wifi_driver_loaded()) {
+     return 0;

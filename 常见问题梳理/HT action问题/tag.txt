@@ -1,0 +1,3 @@
+tag:
+wlan0: state|CTRL-EVENT-CHANNEL|nl80211: Associated with |nl80211: Channel type
+(wlan_mgt.fixed.htact == 0x00&&wlan_mgt.fixed.chanwidth == 0x00)||(wlan.fc.type_subtype == 0x00)||(wlan_mgt.fixed.htact == 0x00&&wlan_mgt.fixed.chanwidth == 0x01)||(wlan.fc.type_subtype == 0x0a)||bootp

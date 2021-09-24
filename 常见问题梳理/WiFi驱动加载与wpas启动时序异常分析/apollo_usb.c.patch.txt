@@ -1,0 +1,101 @@
+Index: apollo_usb.c
+===================================================================
+--- apollo_usb.c	(revision 1393)
++++ apollo_usb.c	(working copy)
+@@ -24,6 +24,7 @@
+ #include <linux/spinlock.h>
+ #include <net/atbm_mac80211.h>
+ #include <linux/kthread.h>
++#include <linux/device.h>
+ #include <linux/usb.h>
+ #include <linux/notifier.h>
+ #include <linux/reboot.h>
+@@ -33,6 +34,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/rtnetlink.h>
+ 
++#include "mac80211/ieee80211_i.h"
+ #include "mac80211/driver-ops.h"
+ #include "hwio.h"
+ #include "apollo.h"
+@@ -3321,6 +3323,72 @@
+ 		usb_platform_dev = NULL;
+ 	}
+ }
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0))
++static int atbm_process_each_dev(struct usb_device *usb_dev, void *data)
++{
++	struct usb_interface *intf = NULL;
++	int probe_wait = 0;
++	bool found = false;
++	
++	printk(KERN_ERR "%s--usb_dev:product(%s),manufacturer(%s),vendor(%x),product(%x)\n",
++		__func__,usb_dev->product,usb_dev->manufacturer,usb_dev->descriptor.idVendor,usb_dev->descriptor.idProduct);
++	if((usb_dev->descriptor.idVendor != 0x7a) || (usb_dev->descriptor.idProduct != 0x8888)){
++		goto exit;
++	}
++retry:
++	
++	intf = usb_find_interface(&apollod_driver,-1);
++
++	if(intf&&(interface_to_usbdev(intf) == usb_dev)){
++		struct net_device *dev;
++
++		rtnl_lock();
++		for_each_netdev(&init_net, dev){
++			struct ieee80211_sub_if_data *sdata;
++			
++			if (!dev->ieee80211_ptr || !dev->ieee80211_ptr->wiphy)
++				continue;
++		
++			if (dev->ieee80211_ptr->wiphy->privid != mac80211_wiphy_privid)
++				continue;
++
++			sdata = IEEE80211_DEV_TO_SUB_IF(dev);
++
++			if(wiphy_dev(sdata->local->hw.wiphy) != &intf->dev){
++				continue;
++			}
++
++			printk(KERN_ERR "%s:found (%s) dev\n",__func__,sdata->name);
++			found = true;
++			break;
++		}	
++		rtnl_unlock();
++		
++	} 
++	
++	if(found == false){
++		probe_wait ++;		
++		if(probe_wait >= 10){
++			goto exit;
++		}
++		printk(KERN_ERR "%s:not find interface(%d)",__func__,probe_wait);
++		schedule_timeout_interruptible(msecs_to_jiffies(300));
++		goto retry;
++	}
++exit:
++	return 0;
++}
++
++static void abtm_usb_enum_each_interface(void)
++{
++	usb_for_each_dev(NULL,atbm_process_each_dev);
++}
++#else
++static void abtm_usb_enum_each_interface(void)
++{
++	
++}
++#endif
+ static int __init atbm_usb_module_init(void)
+ {
+ 	printk(KERN_ERR "atbm_usb_module_init %x\n",wifi_module_exit);
+@@ -3336,6 +3404,7 @@
+ 	atbm_ieee80211_init();
+ 	atbm_usb_init();
+ 	register_reboot_notifier(&atbm_reboot_nb);
++	abtm_usb_enum_each_interface();
+ 	return 0;
+ }
+ //wifi_usb_probe_doing

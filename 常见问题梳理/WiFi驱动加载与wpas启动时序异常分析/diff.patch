@@ -1,0 +1,36 @@
+
+//CVTE add: check interface wlan0 created
+static const char WLAN_FILE[] = "/proc/net/wireless";
+
+//CVTE add begin: check interface wlan0 created
+int is_wifi_interface_created() {
+
+  FILE *proc; //WLAN_FILE
+  char line[MODULES_NAME_MAX];
+
+  if ((proc = fopen(WLAN_FILE, "r")) == NULL) {
+    PLOG(WARNING) << "Could not open " << WLAN_FILE;
+    return 0;
+  }
+
+  while ((fgets(line, sizeof(line), proc)) != NULL) {
+    if (strstr(line, "wlan0") != NULL) {
+      fclose(proc);
+      return 1;
+    }
+  }
+  fclose(proc);
+  return 0;
+}
+//CVTE add end: check interface wlan0 created
+
+//CVTE ADD for check insmod driver success
+while (count-- > 0) {
+  if (is_wifi_interface_created()) break;
+  PLOG(ERROR) << "driver is not ready, wait 150ms";
+  usleep(150000);
+}
+//CVTE END
+   
+路径节点
+/proc/net/wireless
