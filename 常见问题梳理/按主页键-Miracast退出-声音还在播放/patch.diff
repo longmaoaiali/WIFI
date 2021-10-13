@@ -1,0 +1,31 @@
+From 05c2257a6b518a2a8d8f8f334aa31f06f162f6cb Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Sun, 28 Jun 2020 10:50:49 +0800
+Subject: [PATCH] [bugfix][JIRA#PE200012-945][WiFi][only]application is killed and the wifi link is not disconnected
+
+[what]application is killed and the wifi link is not disconnected
+[why]wifi link is not disconnected
+[how]modify the adj value of the application to PERCEPTIBLE_APP_ADJ
+
+Change-Id: If6c652ee1523bb6d388e94288064b41953925f61
+---
+
+diff --git a/base/services/core/java/com/android/server/am/ActivityManagerService.java b/base/services/core/java/com/android/server/am/ActivityManagerService.java
+index 895f9e6..b812350 100755
+--- a/base/services/core/java/com/android/server/am/ActivityManagerService.java
++++ b/base/services/core/java/com/android/server/am/ActivityManagerService.java
+@@ -23416,7 +23416,7 @@
+         }
+ 
+         if (app.processName.contains("com.mediatek.androidbox")) {
+-            app.maxAdj= ProcessList.BACKUP_APP_ADJ;
++            app.maxAdj= ProcessList.PERCEPTIBLE_APP_ADJ;
+         }
+      
+         if (CVT_EN_TECENTTV_OPTIMIZATION && app.processName.contains("com.ktcp.video")) {
+
+
+问题原因：
+因wfd相关应用的adj为900，按home键后，未执行完成activity流程就被kill掉。导致wifi链路没有被断开导致。
+解决方案：
+修改miracast应用对于的adj值，修改为300为backup_app_adj

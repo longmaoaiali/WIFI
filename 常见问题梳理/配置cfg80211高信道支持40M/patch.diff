@@ -1,0 +1,25 @@
+From e8d71db67ddb3106028f6316a0c6bb31edbc585c Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Wed, 20 May 2020 16:42:05 +0800
+Subject: [PATCH] [bugfix][JIRA#SMARTPDT-4374][WiFi][only]Configuration cfg80211 WiFi 2.4g high channel support 40M
+
+[what]WiFi 11ch signal test loss rate is 100%
+[why]cfg80211 config file default high channel does not support 40M
+[how]Modify cfg80211 to configure WiFi 2.4g high channel support of 40M
+
+Change-Id: I6c2b7c34cbc872423d32c4f4848a3d22d49f8da1
+---
+
+diff --git a/kernel/fusion/4.9/net/wireless/db.txt b/kernel/fusion/4.9/net/wireless/db.txt
+index 619122d..a7650c0 100755
+--- a/kernel/fusion/4.9/net/wireless/db.txt
++++ b/kernel/fusion/4.9/net/wireless/db.txt
+@@ -2,7 +2,7 @@
+ country 00:
+ 	(2402 - 2472 @ 40), (20)
+ 	# Channel 12 - 13.
+-	(2457 - 2482 @ 20), (20)
++	(2457 - 2482 @ 20), (20), AUTO-BW
+ 	# Channel 36 - 48
+ 	(5170 - 5250 @ 80), (20)
+ 	# Channel 52 - 64

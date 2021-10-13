@@ -1,0 +1,27 @@
+From 162aee7605f874d35f4294180c3e394d5fa65cd6 Mon Sep 17 00:00:00 2001
+From: lisi4487 <lisi4487@cvte.com>
+Date: Tue, 12 Oct 2021 14:51:00 +0800
+Subject: [PATCH] [feature][cvte][JIRA#EH200084-799][WiFi@aic8800d][part 1/3]Turn on WIFI automatically jump to the wired network
+
+[what]开机WIFI自动跳有线网络
+[why]USB hub超时时间太长，8800枚举失败后无法迅速重新枚举
+[how]修改usb hub枚举超时时间
+
+Change-Id: I1d13c9bf2d7b9359ab9bfc1711d8f0fdf118bf74
+---
+
+diff --git a/kernel/fusion/4.9/drivers/usb/core/hub.c b/kernel/fusion/4.9/drivers/usb/core/hub.c
+old mode 100644
+new mode 100755
+index faeb25a..bbc62b7
+--- a/kernel/fusion/4.9/drivers/usb/core/hub.c
++++ b/kernel/fusion/4.9/drivers/usb/core/hub.c
+@@ -5463,7 +5463,7 @@
+ 					USB_REQ_GET_DESCRIPTOR, USB_DIR_IN,
+ 					USB_DT_DEVICE << 8, 0,
+ 					buf, GET_DESCRIPTOR_BUFSIZE,
+-					initial_descriptor_timeout);
++					2000);
+ 
+ #if (MP_USB_MSTAR==1)
+ 				/* Patch for MTK WIFI dongle (idVendor=148f, idProduct=7601)

@@ -1,0 +1,67 @@
+From dc413a201550156fb2fc5417e6a767cc21d47c80 Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Fri, 19 Jun 2020 11:42:14 +0800
+Subject: [PATCH] [merge][cp-from@fda5f3de][bugfix][JIRA#MD200059-179][WiFi][common]error reason message of broadcast with failed WiFi connection
+
+[what]error reason message of broadcast with failed WiFi connection
+[why]framework send message error
+[how]modify framework send message info
+
+Change-Id: I6c84ceb8a66daf59ed56d16a5bc1133ef5dd8581
+---
+
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStateTracker.java b/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStateTracker.java
+index db4e5ce..6291fd3 100644
+--- a/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStateTracker.java
++++ b/opt/net/wifi/service/java/com/android/server/wifi/SupplicantStateTracker.java
+@@ -92,6 +92,12 @@
+         }
+     }
+ 
++    //CVTE ADD for resolve first enter error psk and second enter correct psk cannot connect
++    public void resetAuthStatus() {
++        mAuthFailureInSupplicantBroadcast = false;
++    }
++    //CVTE END
++
+     public String getSupplicantStateName() {
+         return getCurrentState().getName();
+     }
+@@ -223,7 +229,10 @@
+                     WifiManager.EXTRA_SUPPLICANT_ERROR_REASON,
+                     reasonCode);
+         }
+-        mContext.sendStickyBroadcastAsUser(intent, UserHandle.ALL);
++        //CVTE MODIFY for error reason message of broadcast with failed WiFi connection
++        //mContext.sendStickyBroadcastAsUser(intent, UserHandle.ALL);
++        mContext.sendBroadcastAsUser(intent, UserHandle.ALL);
++        //CVTE END
+     }
+ 
+     /********************************************************
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java b/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
+index 94558ee..cd060e7 100755
+--- a/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
++++ b/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
+@@ -3929,7 +3929,10 @@
+                 case WifiMonitor.AUTHENTICATION_FAILURE_EVENT:
+                     mWifiDiagnostics.captureBugReportData(
+                             WifiDiagnostics.REPORT_REASON_AUTH_FAILURE);
+-                    mSupplicantStateTracker.sendMessage(WifiMonitor.AUTHENTICATION_FAILURE_EVENT);
++                    //CVTE MODIFY for error reason message of broadcast with failed WiFi connection
++                    //mSupplicantStateTracker.sendMessage(WifiMonitor.AUTHENTICATION_FAILURE_EVENT);
++                    mSupplicantStateTracker.sendMessage(Message.obtain(message));
++                    //CVTE END
+                     int disableReason = WifiConfiguration.NetworkSelectionStatus
+                             .DISABLED_AUTHENTICATION_FAILURE;
+                     reasonCode = message.arg1;
+@@ -4138,6 +4141,9 @@
+                     int uid = message.arg2;
+                     bssid = (String) message.obj;
+ 
++                    //CVTE ADD for resolve first enter error psk and second enter correct psk cannot connect
++                    mSupplicantStateTracker.resetAuthStatus();
++                    //CVTE EDN
+                     synchronized (mWifiReqCountLock) {
+                         if (!hasConnectionRequests()) {
+                             if (mNetworkAgent == null) {

@@ -1,0 +1,59 @@
+From 65f31bafb3fed6dffd7fea19d8210341a9897618 Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Tue, 16 Apr 2019 16:34:30 +0800
+Subject: [PATCH] [bugfix][JIRA#DQC-40747][common][wifi]resolve the issue that wifi is unable to connect to the modulation mode of ofdm ap
+
+[what]resolve the issue that wifi is unable to connect to the modulation mode of ofdm ap
+[why]due to ofdm modulation mode, ap reply response frame no IE_DS_PARM
+[how]merge mtk patch remove IE_DS_PARM judge
+
+Change-Id: I9b6840ca7f9e667bf480fddc8637b1a5854cf8e5
+---
+
+diff --git a/linux_mts/ko_modules/wlan/mtk/mt7601/common/cmm_sanity.c b/linux_mts/ko_modules/wlan/mtk/mt7601/common/cmm_sanity.c
+index cfe7308..4d6ac5c 100644
+--- a/linux_mts/ko_modules/wlan/mtk/mt7601/common/cmm_sanity.c
++++ b/linux_mts/ko_modules/wlan/mtk/mt7601/common/cmm_sanity.c
+@@ -1884,8 +1884,9 @@
+ 	*/
+ #endif /* RELEASE_EXCLUDE */
+ 	LatchRfChannel = MsgChannel;
+-
+-	if ((pAd->LatchRfRegs.Channel > 14) && ((Sanity & 0x4) == 0))
++	//resolve wifi can't connect ap that modulation is ofdm mode
++	//if ((pAd->LatchRfRegs.Channel > 14) && ((Sanity & 0x4) == 0))
++	if((Sanity & 0x4) == 0)
+ 	{
+ 		if (CtrlChannel != 0)
+ 			ie_list->Channel = CtrlChannel;
+diff --git a/linux_mts/ko_modules/wlan/mtk/mt7601_cfg80211/common/cmm_sanity.c b/linux_mts/ko_modules/wlan/mtk/mt7601_cfg80211/common/cmm_sanity.c
+index f4775cb..b249504 100755
+--- a/linux_mts/ko_modules/wlan/mtk/mt7601_cfg80211/common/cmm_sanity.c
++++ b/linux_mts/ko_modules/wlan/mtk/mt7601_cfg80211/common/cmm_sanity.c
+@@ -1507,8 +1507,9 @@
+     }
+ 
+ 	LatchRfChannel = MsgChannel;
+-
+-	if ((pAd->LatchRfRegs.Channel > 14) && ((Sanity & 0x4) == 0))
++	//resolve wifi can't connect ap that modulation is ofdm mode
++	//if ((pAd->LatchRfRegs.Channel > 14) && ((Sanity & 0x4) == 0))
++	if((Sanity & 0x4) == 0)
+ 	{
+ 		if (CtrlChannel != 0)
+ 			ie_list->Channel = CtrlChannel;
+diff --git a/linux_mts/ko_modules/wlan/mtk/mt7603_cfg80211/common/cmm_sanity.c b/linux_mts/ko_modules/wlan/mtk/mt7603_cfg80211/common/cmm_sanity.c
+index 6ebcddb..7a73458 100755
+--- a/linux_mts/ko_modules/wlan/mtk/mt7603_cfg80211/common/cmm_sanity.c
++++ b/linux_mts/ko_modules/wlan/mtk/mt7603_cfg80211/common/cmm_sanity.c
+@@ -2034,7 +2034,9 @@
+ 	*/
+ #endif /* RELEASE_EXCLUDE */
+ 	LatchRfChannel = MsgChannel;
+-	if ((pAd->LatchRfRegs.Channel > 14) && ((Sanity & 0x4) == 0))
++	//resolve wifi can't connect ap that modulation is ofdm mode
++	//if ((pAd->LatchRfRegs.Channel > 14) && ((Sanity & 0x4) == 0))
++	if((Sanity & 0x4) == 0)
+ 	{
+ 		if (CtrlChannel != 0)
+ 			ie_list->Channel = CtrlChannel;

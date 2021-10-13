@@ -1,0 +1,36 @@
+From 2b216f8989b6acb8db179aba9cc53cd3f6988f87 Mon Sep 17 00:00:00 2001
+From: liuyu7146 <liuyu7146@cvte.com>
+Date: Tue, 10 Mar 2020 11:49:11 +0800
+Subject: [PATCH] [merge][cp-from@0ea550e4][bugfix][JIRA#TVS-110562][WiFi][common]WiFi network disabled due to using Android network detection function
+
+[what]WiFi network disabled and the network will not connect
+[why]Android network detection function capture the network no internet
+and disabled network
+[how]close Android default network detection function
+
+Change-Id: I232cafbaddc47b21d573268e01d56ef4f50ae57d
+---
+
+diff --git a/services/core/java/com/android/server/connectivity/NetworkMonitor.java b/services/core/java/com/android/server/connectivity/NetworkMonitor.java
+index 9b9a380..bd26da4 100644
+--- a/services/core/java/com/android/server/connectivity/NetworkMonitor.java
++++ b/services/core/java/com/android/server/connectivity/NetworkMonitor.java
+@@ -866,7 +866,10 @@
+ 
+     public boolean getIsCaptivePortalCheckEnabled() {
+         String symbol = Settings.Global.CAPTIVE_PORTAL_MODE;
+-        int defaultValue = Settings.Global.CAPTIVE_PORTAL_MODE_PROMPT;
++        //CVTE MODIFY for set the network captive portal mode default value is not detect.
++        //int defaultValue = Settings.Global.CAPTIVE_PORTAL_MODE_PROMPT;
++        int defaultValue = Settings.Global.CAPTIVE_PORTAL_MODE_IGNORE;
++        //CVTE END
+         int mode = mSettings.getSetting(mContext, symbol, defaultValue);
+         return mode != Settings.Global.CAPTIVE_PORTAL_MODE_IGNORE;
+     }
+
+
+问题原因：
+经check了WiFi整个连接流程，并与客户端多次测试确认。问题原因为：Android 原生对连接的网络进行检查判断是否有互联网络，判断方式是使用访问谷歌预置url服务器。如果无法访问则会将网络设置为disbled状态。导致WiFi无法连接。
+
+解决方案：
+因Android原生对网络检测功能是访问Google服务器，存在客户端网络无法访问到的问题。该功能要使用需要针对做适配开发，使用原生功能会存在问题。经评估该功能对tv几乎无影响，对其进行关闭。

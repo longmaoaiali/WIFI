@@ -1,0 +1,336 @@
+From 857645cc72c068291a908212874e5f24b7d1dba1 Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Thu, 05 Dec 2019 20:44:06 +0800
+Subject: [PATCH] [bugfix][JIRA#PT190024-1522][wifi][common]add for wifi open logic at str switch
+
+[what]wifi is closed when str switch device
+[why] no add feature that open wifi at str swich
+[how] add wifi opening feature at str switch
+
+Change-Id: I08b5386b31cfab65b09365cda80a3709282a6e26
+---
+
+diff --git a/base/services/core/java/com/android/server/policy/PhoneWindowManager.java b/base/services/core/java/com/android/server/policy/PhoneWindowManager.java
+index d308026..ca31e4a 100755
+--- a/base/services/core/java/com/android/server/policy/PhoneWindowManager.java
++++ b/base/services/core/java/com/android/server/policy/PhoneWindowManager.java
+@@ -290,6 +290,9 @@
+ import com.android.server.wm.DisplayFrames;
+ import com.android.server.wm.WindowManagerInternal;
+ import com.android.server.wm.WindowManagerInternal.AppTransitionListener;
++//CVTE ADD for str start device restore wifi.
++import com.android.server.power.SuspendThread;
++//CVTE END
+ import android.content.ServiceConnection;
+ import android.content.ComponentName;
+ import android.app.ActivityManager.RunningTaskInfo;
+@@ -1448,6 +1451,9 @@
+                         mBeganFromNonInteractive = true;
+                     }
+                 }
++                //CVTE ADD for str start device restore wifi.
++                SuspendThread.suspend(mContext, false);
++                //CVTE END
+             }
+         }
+     }
+@@ -1529,6 +1535,9 @@
+                     goToSleep(eventTime, PowerManager.GO_TO_SLEEP_REASON_POWER_BUTTON, 0);
+                     break;
+                 case SHORT_PRESS_POWER_REALLY_GO_TO_SLEEP:
++                    //CVTE ADD for str start device restore wifi.
++                    SuspendThread.suspend(mContext, true);
++                    //CVTE END
+                     goToSleep(eventTime, PowerManager.GO_TO_SLEEP_REASON_POWER_BUTTON,
+                             PowerManager.GO_TO_SLEEP_FLAG_NO_DOZE);
+                     break;
+diff --git a/base/services/core/java/com/android/server/power/SuspendThread.java b/base/services/core/java/com/android/server/power/SuspendThread.java
+new file mode 100755
+index 0000000..918ccdb
+--- /dev/null
++++ b/base/services/core/java/com/android/server/power/SuspendThread.java
+@@ -0,0 +1,284 @@
++/**add WiFi and hotspot open logic at str switch
++*@autho bsp team.
++*@version 1.0.
++*@data 2019/12/05.
++*/
++
++package com.android.server.power;
++
++import android.annotation.SuppressLint;
++import android.content.BroadcastReceiver;
++import android.content.Context;
++import android.content.Intent;
++import android.content.IntentFilter;
++import android.net.wifi.WifiManager;
++import android.os.Handler;
++import android.os.Looper;
++import android.os.Message;
++import android.os.UserHandle;
++import android.os.PowerManager;
++import android.util.Log;
++import android.net.ConnectivityManager;
++
++public final class SuspendThread extends Thread {
++    private static final String TAG = "SuspendThread";
++
++    private static final Object state = new Object();
++    private static final int MSG_START = 0;
++    private static final int MSG_DONE = 1;
++    private static final int MSG_DELAY = 200;
++
++    private static boolean sIsStarted = false;
++    private static boolean isLastDown = false;
++    private static boolean mSuspendDown = false;
++    private static int mActionDone = 0;
++    private static boolean isWifiDisabling = false;
++    private static boolean isWifiApDisabling = false;
++
++    private static Context mContext = null;
++    private static PowerManager.WakeLock mWakeLock = null;
++
++    private static boolean isWifiNeedOn = false;
++    private static boolean isWifiApNeedOn = false;
++
++    private static final Handler mHandler  = new Handler(Looper.getMainLooper()){
++        @Override
++        public void dispatchMessage(Message msg) {
++            super.dispatchMessage(msg);
++            switch (msg.what) {
++                case MSG_START:{
++                    Log.e(TAG, "mHandler dispatchMessage MSG_START.");
++                    actionStart();
++                    break;
++                }
++                case MSG_DONE: {
++                    Log.e(TAG, "mHandler dispatchMessage MSG_DONE.");
++                    actionDone();
++                    break;
++                }
++                default:
++                    break;
++            }
++        }
++    };
++
++    private static final BroadcastReceiver wifireceiver = new BroadcastReceiver() {
++        @Override
++        public void onReceive(Context context, Intent intent) {
++            if (intent.getAction()== WifiManager.WIFI_STATE_CHANGED_ACTION) {
++                switch (intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN)) {
++                    case WifiManager.WIFI_STATE_DISABLED:{
++                        Log.d("wifi", TAG + " --> WiFi disabled");
++                        if (mSuspendDown  && isWifiDisabling) {
++                            isWifiDisabling = false;
++                            Log.d("wifi", "unregisterReceiver when WiFi disabled");
++                            mContext.unregisterReceiver(wifireceiver);
++                            mHandler.sendEmptyMessageDelayed(MSG_DONE, MSG_DELAY);
++                        }
++                        break;
++                    }
++                    case WifiManager.WIFI_STATE_DISABLING:{
++                        Log.d("wifi", TAG + " --> WiFi disabling");
++                        isWifiDisabling = true;
++                        break;
++                    }
++                    case WifiManager.WIFI_STATE_ENABLED :{
++                        Log.d("wifi", TAG + " --> WiFi enabled");
++                        if (!mSuspendDown) {
++                            Log.d("wifi", "unregisterReceiver when WiFi enabled");
++                            isWifiNeedOn = false;
++                            mContext.unregisterReceiver(wifireceiver);
++                            mHandler.sendEmptyMessageDelayed(MSG_DONE, MSG_DELAY);
++                        }
++                        break;
++                    }
++                    case WifiManager.WIFI_STATE_ENABLING:{
++                        Log.d("wifi", TAG + " --> WiFi enabling");
++                        break;
++                    }
++                    case WifiManager.WIFI_STATE_UNKNOWN:{
++                        Log.d("wifi", TAG + " --> WiFi  state unknown");
++                        break;
++                    }
++                }
++            } else if (intent.getAction()== WifiManager.WIFI_AP_STATE_CHANGED_ACTION) {
++                switch (intent.getIntExtra(WifiManager.EXTRA_WIFI_AP_STATE, WifiManager.WIFI_AP_STATE_FAILED)) {
++                    case WifiManager.WIFI_AP_STATE_DISABLED:{
++                        Log.d("wifi", TAG + " --> WiFiAp disabled");
++                        if (mSuspendDown && isWifiApDisabling) {
++                            isWifiApDisabling = false;
++                            Log.d("wifi", "unregisterReceiver when WiFiAp disabled");
++                            mContext.unregisterReceiver(wifireceiver);
++                            mHandler.sendEmptyMessageDelayed(MSG_DONE, MSG_DELAY);
++                        }
++                        break;
++                    }
++                    case WifiManager.WIFI_AP_STATE_DISABLING:{
++                        Log.d("wifi", TAG + " --> WiFiAp disabling");
++                        isWifiApDisabling = true;
++                        break;
++                    }
++                    case WifiManager.WIFI_AP_STATE_ENABLED :{
++                        Log.d("wifi", TAG + " --> WiFiAp enabled");
++                        if (!mSuspendDown) {
++                            Log.d("wifi", "unregisterReceiver when WiFiAp enabled");
++                            isWifiApNeedOn = false;
++                            mContext.unregisterReceiver(wifireceiver);
++                            mHandler.sendEmptyMessageDelayed(MSG_DONE, MSG_DELAY);
++                        }
++                        break;
++                    }
++                    case WifiManager.WIFI_AP_STATE_ENABLING:{
++                        Log.d("wifi", TAG + " --> WiFiAp enabling");
++                        break;
++                    }
++                    case WifiManager.WIFI_AP_STATE_FAILED:{
++                        Log.d("wifi", TAG + " --> WiFiAp  state failed");
++                        break;
++                    }
++                }
++            }
++        }
++    };
++
++    private SuspendThread(Runnable suspendRunnable, boolean down) {
++        super(suspendRunnable);
++        mSuspendDown = down;
++    }
++
++    // ensure that only one thread is trying to suspend.
++    // any additional calls are just returned
++    @SuppressLint({"InvalidWakeLockTag", "HandlerLeak"})
++    public static void suspend(Context context, boolean down) {
++        synchronized (state) {
++            if (sIsStarted || down == isLastDown) {
++                Log.d(TAG, "sIsStarted : " + sIsStarted + " isLastDown : " + isLastDown + " down : " + down);
++                Log.d(TAG, "Request to suspend already running, returning.");
++                return;
++            }
++            isLastDown = down;
++            sIsStarted = true;
++            SuspendThread sInstance = new SuspendThread(SuspendRunnable, down);
++            if (mContext == null) {
++                mContext = context;
++            }
++
++            if (mWakeLock == null) {
++                try {
++                    PowerManager mPowerManager = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
++                    mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
++                    mWakeLock.setReferenceCounted(false);
++                } catch (SecurityException e) {
++                    Log.w(TAG, "No permission to acquire wake lock", e);
++                    mWakeLock = null;
++                }
++            }
++
++            // make sure all the work can be done.
++            if (down && mWakeLock != null) {
++                mWakeLock.acquire(30 * 1000L /*30 s*/);
++            }
++            mActionDone = 0;
++            mHandler.sendEmptyMessage(MSG_START);
++            sInstance.start();
++        }
++    }
++
++    private static void actionStart() {
++        synchronized (state) {
++            mActionDone++;
++        }
++    }
++
++    private static void actionDone() {
++        synchronized (state) {
++            mActionDone--;
++            if (mActionDone <= 0 && mWakeLock.isHeld()) {
++                Log.d(TAG, "mWakeLock.release().");
++                mWakeLock.release();
++            }
++        }
++    }
++
++    private static Runnable SuspendRunnable = new Runnable() {
++        @Override
++        public void run() {
++            Log.e(TAG, " run() mSuspendDown = " + mSuspendDown);
++            if (mSuspendDown) {
++                setWifiOrWifiApOffIfNeed();
++
++            } else {
++                setWifiOrWifiApOnIfNeed();;
++            }
++            Log.e(TAG,"SuspendRunnable MSG_DONE MSG_DELAY");
++            mHandler.sendEmptyMessageDelayed(MSG_DONE, MSG_DELAY);
++            sIsStarted = false;
++        }
++
++        private void setWifiOrWifiApOffIfNeed() {
++            WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
++
++            if (wifiManager.isWifiEnabled() || isWifiNeedOn) {
++                Log.d(TAG, "setWifiOff()");
++                isWifiNeedOn = true;
++                registerWifiBroadcast();
++                mHandler.sendEmptyMessage(MSG_START);
++                wifiManager.setWifiEnabled(false);
++
++            } else if (wifiManager.isWifiApEnabled() || isWifiApNeedOn) {
++                Log.d(TAG, "setWifiApOff()");
++                isWifiApNeedOn = true;
++                registerWifiBroadcast();
++                mHandler.sendEmptyMessage(MSG_START);
++                ConnectivityManager mConnectivityManager = (ConnectivityManager) mContext.
++                        getSystemService(Context.CONNECTIVITY_SERVICE);
++                mConnectivityManager.stopTethering(ConnectivityManager.TETHERING_WIFI);
++
++            }
++        }
++
++        private void registerWifiBroadcast() {
++            Intent wifiIntent = new Intent(WifiManager.WIFI_STATE_CHANGED_ACTION);
++            Intent wifiApIntent = new Intent(WifiManager.WIFI_STATE_CHANGED_ACTION);
++            mContext.removeStickyBroadcastAsUser(wifiIntent, UserHandle.ALL);
++            mContext.removeStickyBroadcastAsUser(wifiApIntent, UserHandle.ALL);
++            IntentFilter filter = new IntentFilter();
++            filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
++            filter.addAction(WifiManager.WIFI_AP_STATE_CHANGED_ACTION);
++            mContext.registerReceiver(wifireceiver, filter);
++        }
++
++        private void setWifiOrWifiApOnIfNeed() {
++            WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
++            Log.d(TAG, "setWifiOrWifiApOnIfNeed isWifiNeedOn : " + isWifiNeedOn +
++                    " isWifiApNeedOn : " + isWifiApNeedOn);
++            if (isWifiNeedOn) {
++                Log.d(TAG, "setWifiOn()");
++                registerWifiBroadcast();
++                try{
++                    Thread.currentThread().sleep(6000);
++                }catch(Exception e){
++                    Log.e(TAG,"delay failed e = " + e);
++                }
++                wifiManager.setWifiEnabled(true);
++            } else if (isWifiApNeedOn) {
++                Log.d(TAG, "setWifiApOn()");
++                registerWifiBroadcast();
++                ConnectivityManager mConnectivityManager = (ConnectivityManager) mContext.
++                        getSystemService(Context.CONNECTIVITY_SERVICE);
++                mConnectivityManager.startTethering(ConnectivityManager.TETHERING_WIFI, false,
++                    new ConnectivityManager.OnStartTetheringCallback(){
++                    @Override
++                    public void onTetheringStarted () {
++                        Log.d(TAG, "setWifiApOn successed");
++                    }
++                    @Override
++                    public void onTetheringFailed () {
++                        Log.d(TAG, "setWifiApOn failed");
++                    }
++                },new Handler(Looper.getMainLooper()));
++            }
++        }
++    };
++}
++

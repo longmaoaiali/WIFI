@@ -1,0 +1,31 @@
+From 082c7fbbb7371528978799ceb6f648ddb8e319af Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Mon, 20 May 2019 20:08:13 +0800
+Subject: [PATCH] [merge][cp-from@ed2bcd4][JIRA#TVS-54628][common][wifi]wifi auto connect failed because save network config error[common][wifi]wifi auto connect failed because save network config error
+
+[what]wifi auto connect failed because save network config error
+[why]two ssid from the same mac,save network config error
+[how]add ssid match judgment
+
+Change-Id: Ic0ac4f4cc63aa24865749bd51f6eb3e2503198a7
+---
+
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigStore.java b/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigStore.java
+old mode 100644
+new mode 100755
+index 94752d3..d33c4e2
+--- a/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigStore.java
++++ b/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigStore.java
+@@ -3151,7 +3151,11 @@
+             if (!doNotAdd && (link.scanResultCache != null) && (link.scanResultCache.size() <= 6)) {
+                 for (String bssid : link.scanResultCache.keySet()) {
+                     if (result.BSSID.regionMatches(true, 0, bssid, 0, 16)
+-                            && SSID.regionMatches(false, 0, link.SSID, 0, 4)) {
++                            //CVTE MODIFY for wifi auto connect failed, because two ssid from the same mac,
++                            //meanwhile, the two networks have different passwords.
++                            //&& SSID.regionMatches(false, 0, link.SSID, 0, 4)) {
++                            && SSID.regionMatches(false, 0, link.SSID, 0, SSID.length())) {
++                            //MODIFY END
+                         // If first 16 ascii characters of BSSID matches, and first 3
+                         // characters of SSID match, we assume this is a home setup
+                         // and thus we will try to transfer the password from the known

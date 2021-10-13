@@ -1,0 +1,41 @@
+From d483900c797106edebc7695372c4db0aba8e50a7 Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Wed, 10 Jun 2020 15:24:39 +0800
+Subject: [PATCH] [bugfix][JIRA#PT190024-3129][WiFi][common]part of a mobile phone's Miracast disconnect and TV freeze screen
+
+[what]part of a mobile phone's Miracast disconnect and TV freeze screen
+[why]part of a mobile phone send disassoc p2p link and no msg callback framework
+[how]receiver disassoc event and invoke p2p interface callback framework
+
+Change-Id: Ie00385a9266f244aff64695cb354e4a0da6daeeb
+---
+
+diff --git a/wpa_supplicant_8/wpa_supplicant/events.c b/wpa_supplicant_8/wpa_supplicant/events.c
+index 63cf773..0ba1150 100644
+--- a/wpa_supplicant_8/wpa_supplicant/events.c
++++ b/wpa_supplicant_8/wpa_supplicant/events.c
+@@ -3406,6 +3406,10 @@
+ 	const u8 *addr = NULL;
+ 	const u8 *ie = NULL;
+ 	size_t ie_len = 0;
++	//CVTE ADD for part of a mobile phone's Miracast disconnect and TV freeze screen
++	struct wpa_ssid *ssid;
++	char *gtype = "client";
++	//CVTE END
+ 
+ 	wpa_dbg(wpa_s, MSG_DEBUG, "Disassociation notification");
+ 
+@@ -3449,6 +3453,13 @@
+ 
+ 	wpas_event_disconnect(wpa_s, addr, reason_code, locally_generated,
+ 			      ie, ie_len, 0);
++	//CVTE ADD for part of a mobile phone's Miracast disconnect and TV freeze screen
++	if(wpa_s->p2p_group_interface == P2P_GROUP_INTERFACE_CLIENT || (strcmp(wpa_s->ifname, "p2p0") == 0)) {
++		wpa_printf(MSG_DEBUG, "disconnect due to receiver DISASSOC event.");
++		ssid = wpa_s->conf->ssid;
++		wpas_notify_p2p_group_removed(wpa_s, ssid, gtype);
++	}
++	//CVTE END
+ }
+ 
+ 

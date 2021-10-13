@@ -1,0 +1,37 @@
+From 2d17c8394df18dba7f88313911e3936abe760c2d Mon Sep 17 00:00:00 2001
+From: taodong <taodong@cvte.com>
+Date: Thu, 14 May 2020 10:51:44 +0800
+Subject: [PATCH] [bugfix][JIRA#SMARTPDT-3639][WiFi][common]remove the feature that wifi don't connect weak signal AP
+
+[what]remove the feature that wifi don't connect weak signal AP
+[why]remove the feature that wifi don't connect weak signal AP
+[how]remove the feature that wifi don't connect weak signal AP
+
+Change-Id: I23e2991ceb6f34ee94f38d4bd272ee52dbbaf6e9
+---
+
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/ScoringParams.java b/opt/net/wifi/service/java/com/android/server/wifi/ScoringParams.java
+index 8f68627..b4f1b7c 100644
+--- a/opt/net/wifi/service/java/com/android/server/wifi/ScoringParams.java
++++ b/opt/net/wifi/service/java/com/android/server/wifi/ScoringParams.java
+@@ -48,12 +48,16 @@
+     private class Values {
+         /** RSSI thresholds for 2.4 GHz band (dBm) */
+         public static final String KEY_RSSI2 = "rssi2";
+-        public final int[] rssi2 = {-83, -80, -73, -60};
+-
++        //CVTE MODIFY for remove the feature that wifi don't connect weak signal AP.
++        //public final int[] rssi2 = {-83, -80, -73, -60};
++        public final int[] rssi2 = {-127, -127, -73, -60};
++        //CVET END
+         /** RSSI thresholds for 5 GHz band (dBm) */
+         public static final String KEY_RSSI5 = "rssi5";
+-        public final int[] rssi5 = {-80, -77, -70, -57};
+-
++        //CVTE MODIFY for remove the feature that wifi don't connect weak signal AP.
++        //public final int[] rssi5 = {-80, -77, -70, -57};
++        public final int[] rssi5 = {-127, -127, -70, -57};
++        //CVET END
+         /** Guidelines based on packet rates (packets/sec) */
+         public static final String KEY_PPS = "pps";
+         public final int[] pps = {0, 1, 100};
