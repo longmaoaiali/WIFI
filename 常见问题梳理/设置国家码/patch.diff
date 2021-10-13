@@ -1,0 +1,943 @@
+From 218b5251a5297c82f386b3dee7593baed41d2a5e Mon Sep 17 00:00:00 2001
+From: chenhainan <chenhainan@cvte.com>
+Date: Wed, 17 Jun 2020 10:56:16 +0800
+Subject: [PATCH] [feature][JIRA#SMARTPDT-4562][wifi-5G]Add Function:wifi set country code
+
+[what]设置wifi国家码
+[why]9632导入7688 5G模块，5G的频段各地不一样，需设置地区码进行scan & connect
+[how]根据ISO 3166标准，获取当前TV的区域(Alpha-3)，转化为(Alpha-2)，并设置到driver
+
+Change-Id: I9543b499fbff69671043f1e567d3bd0030ba81e6
+---
+
+diff --git a/base/core/java/android/provider/Settings.java b/base/core/java/android/provider/Settings.java
+index b9a5ab7..a4fc371 100755
+--- a/base/core/java/android/provider/Settings.java
++++ b/base/core/java/android/provider/Settings.java
+@@ -3641,6 +3641,10 @@
+          */
+         public static final String TIME_12_24 = "time_12_24";
+ 
++        //cvte patch start
++        public static final String TV_COUNTRY_CODE = "tv_current_country_code";
++        //cvte patch end
++
+         /** @hide */
+         public static final Validator TIME_12_24_VALIDATOR =
+                 new SettingsValidators.DiscreteValueValidator(new String[] {"12", "24", null});
+@@ -4219,6 +4223,9 @@
+             PUBLIC_SETTINGS.add(HAPTIC_FEEDBACK_ENABLED);
+             PUBLIC_SETTINGS.add(SHOW_WEB_SUGGESTIONS);
+             PUBLIC_SETTINGS.add(VIBRATE_WHEN_RINGING);
++            //cvte patch start
++            PUBLIC_SETTINGS.add(TV_COUNTRY_CODE);
++            //cvte patch end
+         }
+ 
+         /**
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/ClientModeManager.java b/opt/net/wifi/service/java/com/android/server/wifi/ClientModeManager.java
+old mode 100644
+new mode 100755
+index b5300d2..cf657b9
+--- a/opt/net/wifi/service/java/com/android/server/wifi/ClientModeManager.java
++++ b/opt/net/wifi/service/java/com/android/server/wifi/ClientModeManager.java
+@@ -136,6 +136,12 @@
+             Log.d(TAG, "expected stop, not triggering callbacks: newState = " + newState);
+         }
+ 
++        //cvte patch start
++        if(newState == WifiManager.WIFI_STATE_ENABLED){
++            mWifiStateMachine.cvtSetCurrentCountry();
++        }
++        //cvte patch end
++
+         // Once we report the mode has stopped/failed any other stop signals are redundant
+         // note: this can happen in failure modes where we get multiple callbacks as underlying
+         // components/interface stops or the underlying interface is destroyed in cleanup
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java b/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
+index 930cca7..bf6d964 100755
+--- a/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
++++ b/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
+@@ -83,6 +83,7 @@
+ import android.util.Log;
+ import android.util.Pair;
+ import android.util.SparseArray;
++import android.provider.Settings;
+ 
+ import com.android.internal.R;
+ import com.android.internal.annotations.GuardedBy;
+@@ -107,6 +108,7 @@
+ import com.android.server.wifi.util.TelephonyUtil.SimAuthResponseData;
+ import com.android.server.wifi.util.WifiPermissionsUtil;
+ import com.android.server.wifi.util.WifiPermissionsWrapper;
++import com.android.server.wifi.tvcountry.CvtTvCountry;
+ 
+ import java.io.BufferedReader;
+ import java.io.FileDescriptor;
+@@ -871,6 +873,16 @@
+                         updateConnectedMacRandomizationSetting();
+                     }
+                 });
++        //cvte patch start
++        mFacade.registerContentObserver(mContext, Settings.System.getUriFor(
++                        Settings.System.TV_COUNTRY_CODE), false,
++                new ContentObserver(getHandler()) {
++                    @Override
++                    public void onChange(boolean selfChange) {
++                        cvtSetCurrentCountry();
++                    }
++                });
++        //cvte patch end
+ 
+         mContext.registerReceiver(
+                 new BroadcastReceiver() {
+@@ -919,6 +931,15 @@
+         handleScreenStateChanged(powerManager.isInteractive());
+     }
+ 
++    //cvte patch start
++    public void cvtSetCurrentCountry(){
++        String country = CvtTvCountry.getInstance().getCurrentCountry();
++
++        Log.i(TAG, "wifi country code set to "+country);
++        mWifiNative.setCountryCode(mWifiNative.getClientInterfaceName(), country);
++    }
++    //cvte patch end
++
+     private void registerForWifiMonitorEvents()  {
+         mWifiMonitor.registerHandler(mInterfaceName, CMD_TARGET_BSSID, getHandler());
+         mWifiMonitor.registerHandler(mInterfaceName, CMD_ASSOCIATED_BSSID, getHandler());
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/tvcountry/CvtTvCountry.java b/opt/net/wifi/service/java/com/android/server/wifi/tvcountry/CvtTvCountry.java
+new file mode 100755
+index 0000000..25a40aa
+--- /dev/null
++++ b/opt/net/wifi/service/java/com/android/server/wifi/tvcountry/CvtTvCountry.java
+@@ -0,0 +1,300 @@
++package com.android.server.wifi.tvcountry;
++
++import android.os.SystemProperties;
++import android.util.ArrayMap;
++import android.util.Log;
++
++public class CvtTvCountry {
++    private static final String TAG = "CvtTvCountry";
++    private static final String roTvCountryProp = "ro.product.tv.def.country";
++    private static final String persistTvCountryProp = "persist.sys.cur_country";
++
++    private static ArrayMap<String, String> mTvCountryMap = null;
++    private static CvtTvCountry cvtTvCountry = null;
++
++    public synchronized static CvtTvCountry getInstance(){
++        if (null == cvtTvCountry) {
++            cvtTvCountry = new CvtTvCountry();
++            mTvCountryMap = new ArrayMap<String, String>();
++        }
++        if(mTvCountryMap.isEmpty()){
++            Log.i(TAG, "mTvCountryMap.isEmpty, init mTvCountryMap" );
++            cvtTvCountry.init();
++        }
++        return cvtTvCountry;
++    }
++
++    private CvtTvCountry(){}
++
++    private void init(){
++        //this map from wiki: https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ABW, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AW);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_AFG, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AF);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_AGO, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AO);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_AIA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AI);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ALA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AX);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ALB, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AL);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_AND, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AD);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ARE, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AE);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ARG, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AR);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ARM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ASM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AS);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ATA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AQ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ATF, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TF);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ATG, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AG);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_AUS, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AU);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_AUT, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AT);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_AZE, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_AZ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BDI, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BI);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BEL, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BE);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BEN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BJ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BES, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BQ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BFA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BF);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BGD, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BD);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BGR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BG);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BHR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BH);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BHS, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BS);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BIH, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BA);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BLM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BL);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BLR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BY);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BLZ, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BZ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BMU, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BOL, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BO);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BRA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BR);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BRB, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BB);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BRN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BN);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BTN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BT);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BVT, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BV);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_BWA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_BW);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CAF, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CF);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CAN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CA);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CCK, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CC);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CHE, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CH);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CHL, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CL);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CHN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CN);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CIV, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CI);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CMR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_COD, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CD);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_COG, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CG);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_COK, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CK);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_COL, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CO);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_COM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_KM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CPV, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CV);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CRI, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CR);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CUB, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CU);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CUW, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CW);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CXR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CX);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CYM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_KY);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CYP, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CY);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_CZE, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_CZ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_DEU, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_DE);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_DJI, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_DJ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_DMA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_DM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_DNK, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_DK);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_DOM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_DO);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_DZA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_DZ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ECU, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_EC);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_EGY, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_EG);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ERI, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_ER);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ESH, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_EH);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ESP, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_ES);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_EST, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_EE);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ETH, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_ET);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_FIN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_FI);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_FJI, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_FJ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_FLK, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_FK);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_FRA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_FR);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_FRO, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_FO);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_FSM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_FM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GAB, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GA);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GBR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GB);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GEO, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GE);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GGY, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GG);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GHA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GH);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GIB, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GI);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GIN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GN);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GLP, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GP);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GMB, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GNB, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GW);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GNQ, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GQ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GRC, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GR);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GRD, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GD);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GRL, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GL);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GTM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GT);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GUF, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GF);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GUM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GU);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_GUY, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GY);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_HKG, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_HK);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_HMD, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_HM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_HND, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_HN);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_HRV, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_HR);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_HTI, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_HT);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_HUN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_HU);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_IDN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_ID);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_IMN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_IM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_IND, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_IN);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_IOT, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_IO);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_IRL, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_IE);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_IRN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_IR);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_IRQ, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_IQ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ISL, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_IS);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ISR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_IL);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ITA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_IT);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_JAM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_JM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_JEY, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_JE);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_JOR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_JO);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_JPN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_JP);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_KAZ, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_KZ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_KEN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_KE);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_KGZ, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_KG);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_KHM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_KH);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_KIR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_KI);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_KNA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_KN);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_KOR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_KR);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_KWT, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_KW);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_LAO, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_LA);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_LBN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_LB);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_LBR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_LR);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_LBY, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_LY);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_LCA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_LC);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_LIE, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_LI);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_LKA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_LK);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_LSO, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_LS);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_LTU, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_LT);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_LUX, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_LU);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_LVA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_LV);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MAC, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MO);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MAF, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MF);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MAR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MA);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MCO, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MC);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MDA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MD);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MDG, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MG);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MDV, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MV);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MEX, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MX);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MHL, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MH);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MKD, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MK);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MLI, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_ML);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MLT, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MT);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MMR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MNE, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_ME);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MNG, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MN);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MNP, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MP);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MOZ, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MZ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MRT, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MR);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MSR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MS);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MTQ, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MQ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MUS, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MU);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MWI, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MW);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MYS, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_MY);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_MYT, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_YT);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_NAM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_NA);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_NCL, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_NC);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_NER, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_NE);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_NFK, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_NF);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_NGA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_NG);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_NIC, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_NI);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_NIU, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_NU);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_NLD, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_NL);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_NOR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_NO);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_NPL, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_NP);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_NRU, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_NR);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_NZL, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_NZ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_OMN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_OM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_PAK, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_PK);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_PAN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_PA);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_PCN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_PN);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_PER, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_PE);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_PHL, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_PH);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_PLW, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_PW);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_PNG, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_PG);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_POL, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_PL);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_PRI, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_PR);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_PRK, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_KP);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_PRT, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_PT);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_PRY, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_PY);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_PSE, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_PS);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_PYF, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_PF);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_QAT, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_QA);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_REU, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_RE);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ROU, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_RO);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_RUS, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_RU);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_RWA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_RW);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SAU, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SA);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SDN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SD);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SEN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SN);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SGP, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SG);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SGS, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_GS);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SHN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SH);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SJM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SJ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SLB, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SB);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SLE, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SL);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SLV, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SV);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SMR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SOM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SO);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SPM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_PM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SRB, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_RS);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SSD, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SS);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_STP, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_ST);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SUR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SR);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SVK, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SK);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SVN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SI);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SWE, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SE);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SWZ, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SZ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SXM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SX);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SYC, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SC);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_SYR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_SY);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_TCA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TC);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_TCD, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TD);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_TGO, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TG);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_THA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TH);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_TJK, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TJ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_TKL, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TK);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_TKM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_TLS, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TL);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_TON, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TO);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_TTO, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TT);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_TUN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TN);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_TUR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TR);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_TUV, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TV);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_TWN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TW);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_TZA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_TZ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_UGA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_UG);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_UKR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_UA);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_UMI, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_UM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_URY, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_UY);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_USA, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_US);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_UZB, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_UZ);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_VAT, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_VA);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_VCT, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_VC);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_VEN, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_VE);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_VGB, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_VG);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_VIR, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_VI);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_VNM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_VN);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_VUT, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_VU);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_WLF, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_WF);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_WSM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_WS);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_YEM, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_YE);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ZAF, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_ZA);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ZMB, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_ZM);
++        mTvCountryMap.put(EnumIso3166Alpha3.S3166_CFG_COUNT_ZWE, EnumIso3166Alpha2.ISO3166_ALPHA_2_COUNTRY_ZW);
++    }
++    private String getCountryFromMap(String dtvCountry){
++        if (mTvCountryMap.isEmpty()){
++            return null;
++        }
++        String country = mTvCountryMap.get(dtvCountry);
++        Log.i(TAG, "getCountry: "+ dtvCountry +" -> "+ country);
++        return country;
++    }
++
++    public String getCurrentCountry(){
++        String tvCountry;
++
++        tvCountry = SystemProperties.get(persistTvCountryProp, "0");
++        if ("0".equals(tvCountry)) {
++            tvCountry = SystemProperties.get(roTvCountryProp, "CN");
++        }
++        Log.i(TAG, "Now Tv country code is "+tvCountry);
++        return getCountryFromMap(tvCountry);
++    }
++}
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/tvcountry/EnumIso3166Alpha2.java b/opt/net/wifi/service/java/com/android/server/wifi/tvcountry/EnumIso3166Alpha2.java
+new file mode 100755
+index 0000000..8f0e6f3
+--- /dev/null
++++ b/opt/net/wifi/service/java/com/android/server/wifi/tvcountry/EnumIso3166Alpha2.java
+@@ -0,0 +1,253 @@
++package com.android.server.wifi.tvcountry;
++
++public class EnumIso3166Alpha2 {
++    public static final String ISO3166_ALPHA_2_COUNTRY_AW  = "AW";
++    public static final String ISO3166_ALPHA_2_COUNTRY_AF  = "AF";
++    public static final String ISO3166_ALPHA_2_COUNTRY_AO  = "AO";
++    public static final String ISO3166_ALPHA_2_COUNTRY_AI  = "AI";
++    public static final String ISO3166_ALPHA_2_COUNTRY_AX  = "AX";
++    public static final String ISO3166_ALPHA_2_COUNTRY_AL  = "AL";
++    public static final String ISO3166_ALPHA_2_COUNTRY_AD  = "AD";
++    public static final String ISO3166_ALPHA_2_COUNTRY_AE  = "AE";
++    public static final String ISO3166_ALPHA_2_COUNTRY_AR  = "AR";
++    public static final String ISO3166_ALPHA_2_COUNTRY_AM  = "AM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_AS  = "AS";
++    public static final String ISO3166_ALPHA_2_COUNTRY_AQ  = "AQ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TF  = "TF";
++    public static final String ISO3166_ALPHA_2_COUNTRY_AG  = "AG";
++    public static final String ISO3166_ALPHA_2_COUNTRY_AU  = "AU";
++    public static final String ISO3166_ALPHA_2_COUNTRY_AT  = "AT";
++    public static final String ISO3166_ALPHA_2_COUNTRY_AZ  = "AZ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BI  = "BI";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BE  = "BE";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BJ  = "BJ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BQ  = "BQ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BF  = "BF";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BD  = "BD";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BG  = "BG";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BH  = "BH";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BS  = "BS";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BA  = "BA";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BL  = "BL";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BY  = "BY";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BZ  = "BZ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BM  = "BM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BO  = "BO";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BR  = "BR";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BB  = "BB";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BN  = "BN";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BT  = "BT";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BV  = "BV";
++    public static final String ISO3166_ALPHA_2_COUNTRY_BW  = "BW";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CF  = "CF";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CA  = "CA";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CC  = "CC";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CH  = "CH";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CL  = "CL";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CN  = "CN";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CI  = "CI";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CM  = "CM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CD  = "CD";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CG  = "CG";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CK  = "CK";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CO  = "CO";
++    public static final String ISO3166_ALPHA_2_COUNTRY_KM  = "KM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CV  = "CV";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CR  = "CR";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CU  = "CU";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CW  = "CW";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CX  = "CX";
++    public static final String ISO3166_ALPHA_2_COUNTRY_KY  = "KY";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CY  = "CY";
++    public static final String ISO3166_ALPHA_2_COUNTRY_CZ  = "CZ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_DE  = "DE";
++    public static final String ISO3166_ALPHA_2_COUNTRY_DJ  = "DJ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_DM  = "DM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_DK  = "DK";
++    public static final String ISO3166_ALPHA_2_COUNTRY_DO  = "DO";
++    public static final String ISO3166_ALPHA_2_COUNTRY_DZ  = "DZ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_EC  = "EC";
++    public static final String ISO3166_ALPHA_2_COUNTRY_EG  = "EG";
++    public static final String ISO3166_ALPHA_2_COUNTRY_ER  = "ER";
++    public static final String ISO3166_ALPHA_2_COUNTRY_EH  = "EH";
++    public static final String ISO3166_ALPHA_2_COUNTRY_ES  = "ES";
++    public static final String ISO3166_ALPHA_2_COUNTRY_EE  = "EE";
++    public static final String ISO3166_ALPHA_2_COUNTRY_ET  = "ET";
++    public static final String ISO3166_ALPHA_2_COUNTRY_FI  = "FI";
++    public static final String ISO3166_ALPHA_2_COUNTRY_FJ  = "FJ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_FK  = "FK";
++    public static final String ISO3166_ALPHA_2_COUNTRY_FR  = "FR";
++    public static final String ISO3166_ALPHA_2_COUNTRY_FO  = "FO";
++    public static final String ISO3166_ALPHA_2_COUNTRY_FM  = "FM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GA  = "GA";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GB  = "GB";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GE  = "GE";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GG  = "GG";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GH  = "GH";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GI  = "GI";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GN  = "GN";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GP  = "GP";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GM  = "GM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GW  = "GW";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GQ  = "GQ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GR  = "GR";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GD  = "GD";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GL  = "GL";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GT  = "GT";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GF  = "GF";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GU  = "GU";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GY  = "GY";
++    public static final String ISO3166_ALPHA_2_COUNTRY_HK  = "HK";
++    public static final String ISO3166_ALPHA_2_COUNTRY_HM  = "HM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_HN  = "HN";
++    public static final String ISO3166_ALPHA_2_COUNTRY_HR  = "HR";
++    public static final String ISO3166_ALPHA_2_COUNTRY_HT  = "HT";
++    public static final String ISO3166_ALPHA_2_COUNTRY_HU  = "HU";
++    public static final String ISO3166_ALPHA_2_COUNTRY_ID  = "ID";
++    public static final String ISO3166_ALPHA_2_COUNTRY_IM  = "IM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_IN  = "IN";
++    public static final String ISO3166_ALPHA_2_COUNTRY_IO  = "IO";
++    public static final String ISO3166_ALPHA_2_COUNTRY_IE  = "IE";
++    public static final String ISO3166_ALPHA_2_COUNTRY_IR  = "IR";
++    public static final String ISO3166_ALPHA_2_COUNTRY_IQ  = "IQ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_IS  = "IS";
++    public static final String ISO3166_ALPHA_2_COUNTRY_IL  = "IL";
++    public static final String ISO3166_ALPHA_2_COUNTRY_IT  = "IT";
++    public static final String ISO3166_ALPHA_2_COUNTRY_JM  = "JM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_JE  = "JE";
++    public static final String ISO3166_ALPHA_2_COUNTRY_JO  = "JO";
++    public static final String ISO3166_ALPHA_2_COUNTRY_JP  = "JP";
++    public static final String ISO3166_ALPHA_2_COUNTRY_KZ  = "KZ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_KE  = "KE";
++    public static final String ISO3166_ALPHA_2_COUNTRY_KG  = "KG";
++    public static final String ISO3166_ALPHA_2_COUNTRY_KH  = "KH";
++    public static final String ISO3166_ALPHA_2_COUNTRY_KI  = "KI";
++    public static final String ISO3166_ALPHA_2_COUNTRY_KN  = "KN";
++    public static final String ISO3166_ALPHA_2_COUNTRY_KR  = "KR";
++    public static final String ISO3166_ALPHA_2_COUNTRY_KW  = "KW";
++    public static final String ISO3166_ALPHA_2_COUNTRY_LA  = "LA";
++    public static final String ISO3166_ALPHA_2_COUNTRY_LB  = "LB";
++    public static final String ISO3166_ALPHA_2_COUNTRY_LR  = "LR";
++    public static final String ISO3166_ALPHA_2_COUNTRY_LY  = "LY";
++    public static final String ISO3166_ALPHA_2_COUNTRY_LC  = "LC";
++    public static final String ISO3166_ALPHA_2_COUNTRY_LI  = "LI";
++    public static final String ISO3166_ALPHA_2_COUNTRY_LK  = "LK";
++    public static final String ISO3166_ALPHA_2_COUNTRY_LS  = "LS";
++    public static final String ISO3166_ALPHA_2_COUNTRY_LT  = "LT";
++    public static final String ISO3166_ALPHA_2_COUNTRY_LU  = "LU";
++    public static final String ISO3166_ALPHA_2_COUNTRY_LV  = "LV";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MO  = "MO";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MF  = "MF";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MA  = "MA";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MC  = "MC";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MD  = "MD";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MG  = "MG";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MV  = "MV";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MX  = "MX";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MH  = "MH";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MK  = "MK";
++    public static final String ISO3166_ALPHA_2_COUNTRY_ML  = "ML";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MT  = "MT";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MM  = "MM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_ME  = "ME";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MN  = "MN";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MP  = "MP";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MZ  = "MZ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MR  = "MR";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MS  = "MS";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MQ  = "MQ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MU  = "MU";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MW  = "MW";
++    public static final String ISO3166_ALPHA_2_COUNTRY_MY  = "MY";
++    public static final String ISO3166_ALPHA_2_COUNTRY_YT  = "YT";
++    public static final String ISO3166_ALPHA_2_COUNTRY_NA  = "NA";
++    public static final String ISO3166_ALPHA_2_COUNTRY_NC  = "NC";
++    public static final String ISO3166_ALPHA_2_COUNTRY_NE  = "NE";
++    public static final String ISO3166_ALPHA_2_COUNTRY_NF  = "NF";
++    public static final String ISO3166_ALPHA_2_COUNTRY_NG  = "NG";
++    public static final String ISO3166_ALPHA_2_COUNTRY_NI  = "NI";
++    public static final String ISO3166_ALPHA_2_COUNTRY_NU  = "NU";
++    public static final String ISO3166_ALPHA_2_COUNTRY_NL  = "NL";
++    public static final String ISO3166_ALPHA_2_COUNTRY_NO  = "NO";
++    public static final String ISO3166_ALPHA_2_COUNTRY_NP  = "NP";
++    public static final String ISO3166_ALPHA_2_COUNTRY_NR  = "NR";
++    public static final String ISO3166_ALPHA_2_COUNTRY_NZ  = "NZ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_OM  = "OM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_PK  = "PK";
++    public static final String ISO3166_ALPHA_2_COUNTRY_PA  = "PA";
++    public static final String ISO3166_ALPHA_2_COUNTRY_PN  = "PN";
++    public static final String ISO3166_ALPHA_2_COUNTRY_PE  = "PE";
++    public static final String ISO3166_ALPHA_2_COUNTRY_PH  = "PH";
++    public static final String ISO3166_ALPHA_2_COUNTRY_PW  = "PW";
++    public static final String ISO3166_ALPHA_2_COUNTRY_PG  = "PG";
++    public static final String ISO3166_ALPHA_2_COUNTRY_PL  = "PL";
++    public static final String ISO3166_ALPHA_2_COUNTRY_PR  = "PR";
++    public static final String ISO3166_ALPHA_2_COUNTRY_KP  = "KP";
++    public static final String ISO3166_ALPHA_2_COUNTRY_PT  = "PT";
++    public static final String ISO3166_ALPHA_2_COUNTRY_PY  = "PY";
++    public static final String ISO3166_ALPHA_2_COUNTRY_PS  = "PS";
++    public static final String ISO3166_ALPHA_2_COUNTRY_PF  = "PF";
++    public static final String ISO3166_ALPHA_2_COUNTRY_QA  = "QA";
++    public static final String ISO3166_ALPHA_2_COUNTRY_RE  = "RE";
++    public static final String ISO3166_ALPHA_2_COUNTRY_RO  = "RO";
++    public static final String ISO3166_ALPHA_2_COUNTRY_RU  = "RU";
++    public static final String ISO3166_ALPHA_2_COUNTRY_RW  = "RW";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SA  = "SA";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SD  = "SD";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SN  = "SN";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SG  = "SG";
++    public static final String ISO3166_ALPHA_2_COUNTRY_GS  = "GS";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SH  = "SH";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SJ  = "SJ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SB  = "SB";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SL  = "SL";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SV  = "SV";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SM  = "SM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SO  = "SO";
++    public static final String ISO3166_ALPHA_2_COUNTRY_PM  = "PM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_RS  = "RS";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SS  = "SS";
++    public static final String ISO3166_ALPHA_2_COUNTRY_ST  = "ST";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SR  = "SR";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SK  = "SK";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SI  = "SI";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SE  = "SE";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SZ  = "SZ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SX  = "SX";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SC  = "SC";
++    public static final String ISO3166_ALPHA_2_COUNTRY_SY  = "SY";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TC  = "TC";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TD  = "TD";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TG  = "TG";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TH  = "TH";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TJ  = "TJ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TK  = "TK";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TM  = "TM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TL  = "TL";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TO  = "TO";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TT  = "TT";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TN  = "TN";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TR  = "TR";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TV  = "TV";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TW  = "TW";
++    public static final String ISO3166_ALPHA_2_COUNTRY_TZ  = "TZ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_UG  = "UG";
++    public static final String ISO3166_ALPHA_2_COUNTRY_UA  = "UA";
++    public static final String ISO3166_ALPHA_2_COUNTRY_UM  = "UM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_UY  = "UY";
++    public static final String ISO3166_ALPHA_2_COUNTRY_US  = "US";
++    public static final String ISO3166_ALPHA_2_COUNTRY_UZ  = "UZ";
++    public static final String ISO3166_ALPHA_2_COUNTRY_VA  = "VA";
++    public static final String ISO3166_ALPHA_2_COUNTRY_VC  = "VC";
++    public static final String ISO3166_ALPHA_2_COUNTRY_VE  = "VE";
++    public static final String ISO3166_ALPHA_2_COUNTRY_VG  = "VG";
++    public static final String ISO3166_ALPHA_2_COUNTRY_VI  = "VI";
++    public static final String ISO3166_ALPHA_2_COUNTRY_VN  = "VN";
++    public static final String ISO3166_ALPHA_2_COUNTRY_VU  = "VU";
++    public static final String ISO3166_ALPHA_2_COUNTRY_WF  = "WF";
++    public static final String ISO3166_ALPHA_2_COUNTRY_WS  = "WS";
++    public static final String ISO3166_ALPHA_2_COUNTRY_YE  = "YE";
++    public static final String ISO3166_ALPHA_2_COUNTRY_ZA  = "ZA";
++    public static final String ISO3166_ALPHA_2_COUNTRY_ZM  = "ZM";
++    public static final String ISO3166_ALPHA_2_COUNTRY_ZW  = "ZW";
++}
+diff --git a/opt/net/wifi/service/java/com/android/server/wifi/tvcountry/EnumIso3166Alpha3.java b/opt/net/wifi/service/java/com/android/server/wifi/tvcountry/EnumIso3166Alpha3.java
+new file mode 100755
+index 0000000..98fc772
+--- /dev/null
++++ b/opt/net/wifi/service/java/com/android/server/wifi/tvcountry/EnumIso3166Alpha3.java
+@@ -0,0 +1,263 @@
++package com.android.server.wifi.tvcountry;
++
++public class EnumIso3166Alpha3 {
++    public static final String S3166_CFG_COUNT_ABW = "ABW";
++    public static final String S3166_CFG_COUNT_AFG = "AFG";
++    public static final String S3166_CFG_COUNT_AGO = "AGO";
++    public static final String S3166_CFG_COUNT_AIA = "AIA";
++    public static final String S3166_CFG_COUNT_ALA = "ALA";
++    public static final String S3166_CFG_COUNT_ALB = "ALB";
++    public static final String S3166_CFG_COUNT_AND = "AND";
++    public static final String S3166_CFG_COUNT_ARE = "ARE";
++    public static final String S3166_CFG_COUNT_ARG = "ARG";
++    public static final String S3166_CFG_COUNT_ARM = "ARM";
++    public static final String S3166_CFG_COUNT_ASM = "ASM";
++    public static final String S3166_CFG_COUNT_ATA = "ATA";
++    public static final String S3166_CFG_COUNT_ATF = "ATF";
++    public static final String S3166_CFG_COUNT_ATG = "ATG";
++    public static final String S3166_CFG_COUNT_AUS = "AUS";
++    public static final String S3166_CFG_COUNT_AUT = "AUT";
++    public static final String S3166_CFG_COUNT_AZE = "AZE";
++    public static final String S3166_CFG_COUNT_BDI = "BDI";
++    public static final String S3166_CFG_COUNT_BEL = "BEL";
++    public static final String S3166_CFG_COUNT_BEN = "BEN";
++    public static final String S3166_CFG_COUNT_BES = "BES";
++    public static final String S3166_CFG_COUNT_BFA = "BFA";
++    public static final String S3166_CFG_COUNT_BGD = "BGD";
++    public static final String S3166_CFG_COUNT_BGR = "BGR";
++    public static final String S3166_CFG_COUNT_BHR = "BHR";
++    public static final String S3166_CFG_COUNT_BHS = "BHS";
++    public static final String S3166_CFG_COUNT_BIH = "BIH";
++    public static final String S3166_CFG_COUNT_BLM = "BLM";
++    public static final String S3166_CFG_COUNT_BLR = "BLR";
++    public static final String S3166_CFG_COUNT_BLZ = "BLZ";
++    public static final String S3166_CFG_COUNT_BMU = "BMU";
++    public static final String S3166_CFG_COUNT_BOL = "BOL";
++    public static final String S3166_CFG_COUNT_BRA = "BRA";
++    public static final String S3166_CFG_COUNT_BRB = "BRB";
++    public static final String S3166_CFG_COUNT_BRN = "BRN";
++    public static final String S3166_CFG_COUNT_BTN = "BTN";
++    public static final String S3166_CFG_COUNT_BVT = "BVT";
++    public static final String S3166_CFG_COUNT_BWA = "BWA";
++    public static final String S3166_CFG_COUNT_CAF = "CAF";
++    public static final String S3166_CFG_COUNT_CAN = "CAN";
++    public static final String S3166_CFG_COUNT_CCK = "CCK";
++    public static final String S3166_CFG_COUNT_CHE = "CHE";
++    public static final String S3166_CFG_COUNT_CHL = "CHL";
++    public static final String S3166_CFG_COUNT_CHN = "CHN";
++    public static final String S3166_CFG_COUNT_CIV = "CIV";
++    public static final String S3166_CFG_COUNT_CMR = "CMR";
++    public static final String S3166_CFG_COUNT_COD = "COD";
++    public static final String S3166_CFG_COUNT_COG = "COG";
++    public static final String S3166_CFG_COUNT_COK = "COK";
++    public static final String S3166_CFG_COUNT_COL = "COL";
++    public static final String S3166_CFG_COUNT_CIS = "CIS";
++    public static final String S3166_CFG_COUNT_COM = "COM";
++    public static final String S3166_CFG_COUNT_CPV = "CPV";
++    public static final String S3166_CFG_COUNT_CRI = "CRI";
++    public static final String S3166_CFG_COUNT_CUB = "CUB";
++    public static final String S3166_CFG_COUNT_CUW = "CUW";
++    public static final String S3166_CFG_COUNT_CXR = "CXR";
++    public static final String S3166_CFG_COUNT_CYM = "CYM";
++    public static final String S3166_CFG_COUNT_CYP = "CYP";
++    public static final String S3166_CFG_COUNT_CZE = "CZE";
++    public static final String S3166_CFG_COUNT_DEU = "DEU";
++    public static final String S3166_CFG_COUNT_DJI = "DJI";
++    public static final String S3166_CFG_COUNT_DMA = "DMA";
++    public static final String S3166_CFG_COUNT_DNK = "DNK";
++    public static final String S3166_CFG_COUNT_DOM = "DOM";
++    public static final String S3166_CFG_COUNT_DZA = "DZA";
++    public static final String S3166_CFG_COUNT_ECU = "ECU";
++    public static final String S3166_CFG_COUNT_EGY = "EGY";
++    public static final String S3166_CFG_COUNT_ERI = "ERI";
++    public static final String S3166_CFG_COUNT_ESH = "ESH";
++    public static final String S3166_CFG_COUNT_ESP = "ESP";
++    public static final String S3166_CFG_COUNT_EST = "EST";
++    public static final String S3166_CFG_COUNT_ETH = "ETH";
++    public static final String S3166_CFG_COUNT_FIN = "FIN";
++    public static final String S3166_CFG_COUNT_FJI = "FJI";
++    public static final String S3166_CFG_COUNT_FLK = "FLK";
++    public static final String S3166_CFG_COUNT_FRA = "FRA";
++    public static final String S3166_CFG_COUNT_FRO = "FRO";
++    public static final String S3166_CFG_COUNT_FSM = "FSM";
++    public static final String S3166_CFG_COUNT_GAB = "GAB";
++    public static final String S3166_CFG_COUNT_GBR = "GBR";
++    public static final String S3166_CFG_COUNT_GEO = "GEO";
++    public static final String S3166_CFG_COUNT_GGY = "GGY";
++    public static final String S3166_CFG_COUNT_GHA = "GHA";
++    public static final String S3166_CFG_COUNT_GIB = "GIB";
++    public static final String S3166_CFG_COUNT_GIN = "GIN";
++    public static final String S3166_CFG_COUNT_GLP = "GLP";
++    public static final String S3166_CFG_COUNT_GMB = "GMB";
++    public static final String S3166_CFG_COUNT_GNB = "GNB";
++    public static final String S3166_CFG_COUNT_GNQ = "GNQ";
++    public static final String S3166_CFG_COUNT_GRC = "GRC";
++    public static final String S3166_CFG_COUNT_GRD = "GRD";
++    public static final String S3166_CFG_COUNT_GRL = "GRL";
++    public static final String S3166_CFG_COUNT_GTM = "GTM";
++    public static final String S3166_CFG_COUNT_GUF = "GUF";
++    public static final String S3166_CFG_COUNT_GUM = "GUM";
++    public static final String S3166_CFG_COUNT_GUY = "GUY";
++    public static final String S3166_CFG_COUNT_HKG = "HKG";
++    public static final String S3166_CFG_COUNT_HMD = "HMD";
++    public static final String S3166_CFG_COUNT_HND = "HND";
++    public static final String S3166_CFG_COUNT_HRV = "HRV";
++    public static final String S3166_CFG_COUNT_HTI = "HTI";
++    public static final String S3166_CFG_COUNT_HUN = "HUN";
++    public static final String S3166_CFG_COUNT_IDN = "IDN";
++    public static final String S3166_CFG_COUNT_IMN = "IMN";
++    public static final String S3166_CFG_COUNT_IND = "IND";
++    public static final String S3166_CFG_COUNT_IOT = "IOT";
++    public static final String S3166_CFG_COUNT_IRL = "IRL";
++    public static final String S3166_CFG_COUNT_IRN = "IRN";
++    public static final String S3166_CFG_COUNT_IRQ = "IRQ";
++    public static final String S3166_CFG_COUNT_ISL = "ISL";
++    public static final String S3166_CFG_COUNT_ISR = "ISR";
++    public static final String S3166_CFG_COUNT_ITA = "ITA";
++    public static final String S3166_CFG_COUNT_JAM = "JAM";
++    public static final String S3166_CFG_COUNT_JEY = "JEY";
++    public static final String S3166_CFG_COUNT_JOR = "JOR";
++    public static final String S3166_CFG_COUNT_JPN = "JPN";
++    public static final String S3166_CFG_COUNT_KAZ = "KAZ";
++    public static final String S3166_CFG_COUNT_KEN = "KEN";
++    public static final String S3166_CFG_COUNT_KGZ = "KGZ";
++    public static final String S3166_CFG_COUNT_KHM = "KHM";
++    public static final String S3166_CFG_COUNT_KIR = "KIR";
++    public static final String S3166_CFG_COUNT_KNA = "KNA";
++    public static final String S3166_CFG_COUNT_KOR = "KOR";
++    public static final String S3166_CFG_COUNT_KWT = "KWT";
++    public static final String S3166_CFG_COUNT_LAO = "LAO";
++    public static final String S3166_CFG_COUNT_LBN = "LBN";
++    public static final String S3166_CFG_COUNT_LBR = "LBR";
++    public static final String S3166_CFG_COUNT_LBY = "LBY";
++    public static final String S3166_CFG_COUNT_LCA = "LCA";
++    public static final String S3166_CFG_COUNT_LIE = "LIE";
++    public static final String S3166_CFG_COUNT_LKA = "LKA";
++    public static final String S3166_CFG_COUNT_LSO = "LSO";
++    public static final String S3166_CFG_COUNT_LTU = "LTU";
++    public static final String S3166_CFG_COUNT_LUX = "LUX";
++    public static final String S3166_CFG_COUNT_LVA = "LVA";
++    public static final String S3166_CFG_COUNT_MAC = "MAC";
++    public static final String S3166_CFG_COUNT_MAF = "MAF";
++    public static final String S3166_CFG_COUNT_MAR = "MAR";
++    public static final String S3166_CFG_COUNT_MCO = "MCO";
++    public static final String S3166_CFG_COUNT_MDA = "MDA";
++    public static final String S3166_CFG_COUNT_MDG = "MDG";
++    public static final String S3166_CFG_COUNT_MDV = "MDV";
++    public static final String S3166_CFG_COUNT_MEX = "MEX";
++    public static final String S3166_CFG_COUNT_MHL = "MHL";
++    public static final String S3166_CFG_COUNT_MKD = "MKD";
++    public static final String S3166_CFG_COUNT_MLI = "MLI";
++    public static final String S3166_CFG_COUNT_MLT = "MLT";
++    public static final String S3166_CFG_COUNT_MMR = "MMR";
++    public static final String S3166_CFG_COUNT_MNE = "MNE";
++    public static final String S3166_CFG_COUNT_MNG = "MNG";
++    public static final String S3166_CFG_COUNT_MNP = "MNP";
++    public static final String S3166_CFG_COUNT_MOZ = "MOZ";
++    public static final String S3166_CFG_COUNT_MRT = "MRT";
++    public static final String S3166_CFG_COUNT_MSR = "MSR";
++    public static final String S3166_CFG_COUNT_MTQ = "MTQ";
++    public static final String S3166_CFG_COUNT_MUS = "MUS";
++    public static final String S3166_CFG_COUNT_MWI = "MWI";
++    public static final String S3166_CFG_COUNT_MYS = "MYS";
++    public static final String S3166_CFG_COUNT_MYT = "MYT";
++    public static final String S3166_CFG_COUNT_NAM = "NAM";
++    public static final String S3166_CFG_COUNT_NCL = "NCL";
++    public static final String S3166_CFG_COUNT_NER = "NER";
++    public static final String S3166_CFG_COUNT_NFK = "NFK";
++    public static final String S3166_CFG_COUNT_NGA = "NGA";
++    public static final String S3166_CFG_COUNT_NIC = "NIC";
++    public static final String S3166_CFG_COUNT_NIU = "NIU";
++    public static final String S3166_CFG_COUNT_NLD = "NLD";
++    public static final String S3166_CFG_COUNT_NOR = "NOR";
++    public static final String S3166_CFG_COUNT_NPL = "NPL";
++    public static final String S3166_CFG_COUNT_NRU = "NRU";
++    public static final String S3166_CFG_COUNT_NZL = "NZL";
++    public static final String S3166_CFG_COUNT_OMN = "OMN";
++    public static final String S3166_CFG_COUNT_PAK = "PAK";
++    public static final String S3166_CFG_COUNT_PAN = "PAN";
++    public static final String S3166_CFG_COUNT_PCN = "PCN";
++    public static final String S3166_CFG_COUNT_PER = "PER";
++    public static final String S3166_CFG_COUNT_PHL = "PHL";
++    public static final String S3166_CFG_COUNT_PLW = "PLW";
++    public static final String S3166_CFG_COUNT_PNG = "PNG";
++    public static final String S3166_CFG_COUNT_POL = "POL";
++    public static final String S3166_CFG_COUNT_PRI = "PRI";
++    public static final String S3166_CFG_COUNT_PRK = "PRK";
++    public static final String S3166_CFG_COUNT_PRT = "PRT";
++    public static final String S3166_CFG_COUNT_PRY = "PRY";
++    public static final String S3166_CFG_COUNT_PSE = "PSE";
++    public static final String S3166_CFG_COUNT_PYF = "PYF";
++    public static final String S3166_CFG_COUNT_QAT = "QAT";
++    public static final String S3166_CFG_COUNT_REU = "REU";
++    public static final String S3166_CFG_COUNT_ROU = "ROU";
++    public static final String S3166_CFG_COUNT_RUS = "RUS";
++    public static final String S3166_CFG_COUNT_RWA = "RWA";
++    public static final String S3166_CFG_COUNT_SAU = "SAU";
++    public static final String S3166_CFG_COUNT_SDN = "SDN";
++    public static final String S3166_CFG_COUNT_SEN = "SEN";
++    public static final String S3166_CFG_COUNT_SGP = "SGP";
++    public static final String S3166_CFG_COUNT_SGS = "SGS";
++    public static final String S3166_CFG_COUNT_SHN = "SHN";
++    public static final String S3166_CFG_COUNT_SJM = "SJM";
++    public static final String S3166_CFG_COUNT_SLB = "SLB";
++    public static final String S3166_CFG_COUNT_SLE = "SLE";
++    public static final String S3166_CFG_COUNT_SLV = "SLV";
++    public static final String S3166_CFG_COUNT_SMR = "SMR";
++    public static final String S3166_CFG_COUNT_SOM = "SOM";
++    public static final String S3166_CFG_COUNT_SPM = "SPM";
++    public static final String S3166_CFG_COUNT_SRB = "SRB";
++    public static final String S3166_CFG_COUNT_SSD = "SSD";
++    public static final String S3166_CFG_COUNT_STP = "STP";
++    public static final String S3166_CFG_COUNT_SUR = "SUR";
++    public static final String S3166_CFG_COUNT_SVK = "SVK";
++    public static final String S3166_CFG_COUNT_SVN = "SVN";
++    public static final String S3166_CFG_COUNT_SWE = "SWE";
++    public static final String S3166_CFG_COUNT_SWZ = "SWZ";
++    public static final String S3166_CFG_COUNT_SXM = "SXM";
++    public static final String S3166_CFG_COUNT_SYC = "SYC";
++    public static final String S3166_CFG_COUNT_SYR = "SYR";
++    public static final String S3166_CFG_COUNT_TCA = "TCA";
++    public static final String S3166_CFG_COUNT_TCD = "TCD";
++    public static final String S3166_CFG_COUNT_TGO = "TGO";
++    public static final String S3166_CFG_COUNT_THA = "THA";
++    public static final String S3166_CFG_COUNT_TJK = "TJK";
++    public static final String S3166_CFG_COUNT_TKL = "TKL";
++    public static final String S3166_CFG_COUNT_TKM = "TKM";
++    public static final String S3166_CFG_COUNT_TLS = "TLS";
++    public static final String S3166_CFG_COUNT_TON = "TON";
++    public static final String S3166_CFG_COUNT_TTO = "TTO";
++    public static final String S3166_CFG_COUNT_TUN = "TUN";
++    public static final String S3166_CFG_COUNT_TUR = "TUR";
++    public static final String S3166_CFG_COUNT_TUV = "TUV";
++    public static final String S3166_CFG_COUNT_TWN = "TWN";
++    public static final String S3166_CFG_COUNT_TZA = "TZA";
++    public static final String S3166_CFG_COUNT_UGA = "UGA";
++    public static final String S3166_CFG_COUNT_UKR = "UKR";
++    public static final String S3166_CFG_COUNT_UMI = "UMI";
++    public static final String S3166_CFG_COUNT_URY = "URY";
++    public static final String S3166_CFG_COUNT_USA = "USA";
++    public static final String S3166_CFG_COUNT_UZB = "UZB";
++    public static final String S3166_CFG_COUNT_VAT = "VAT";
++    public static final String S3166_CFG_COUNT_VCT = "VCT";
++    public static final String S3166_CFG_COUNT_VEN = "VEN";
++    public static final String S3166_CFG_COUNT_VGB = "VGB";
++    public static final String S3166_CFG_COUNT_VIR = "VIR";
++    public static final String S3166_CFG_COUNT_VNM = "VNM";
++    public static final String S3166_CFG_COUNT_VUT = "VUT";
++    public static final String S3166_CFG_COUNT_WLF = "WLF";
++    public static final String S3166_CFG_COUNT_WSM = "WSM";
++    public static final String S3166_CFG_COUNT_YEM = "YEM";
++    public static final String S3166_CFG_COUNT_ZAF = "ZAF";
++    public static final String S3166_CFG_COUNT_ZMB = "ZMB";
++    public static final String S3166_CFG_COUNT_ZWE = "ZWE";
++    public static final String S3166_CFG_COUNT_XAP = "XAP";
++    public static final String S3166_CFG_COUNT_XLV = "XLV";
++    public static final String S3166_CFG_COUNT_XGC = "XGC";
++    public static final String S3166_CFG_COUNT_XIS = "XIS";
++    public static final String S3166_CFG_COUNT_XNA = "XNA";
++    public static final String S3166_CFG_COUNT_XEA = "XEA";
++    public static final String S3166_CFG_COUNT_XWA = "XWA";
++    public static final String S3166_CFG_COUNT_XAF = "XAF";
++    public static final String S3166_CFG_COUNT_XME = "XME";
++}
