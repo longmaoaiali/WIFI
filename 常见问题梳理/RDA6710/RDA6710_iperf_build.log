@@ -1,0 +1,227 @@
+builder@sis-RDA6710(dev_lcd):~/code/code/aps/test/network/iperf$source build.sh
+configure: WARNING: If you wanted to set the --build type, don't use --host.
+    If a cross compiler is detected then cross compile mode will be used.
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking for mips-linux-strip... no
+checking for strip... strip
+checking whether the C++ compiler works... yes
+checking for C++ compiler default output file name... a.out
+checking for suffix of executables...
+checking whether we are cross compiling... yes
+checking for suffix of object files... o
+checking whether we are using the GNU C++ compiler... yes
+checking whether mipsel-unknown-linux-uclibc-g++ accepts -g... yes
+checking for style of include used by make... GNU
+checking dependency style of mipsel-unknown-linux-uclibc-g++... gcc3
+checking for mips-linux-gcc... mipsel-unknown-linux-uclibc-gcc
+checking whether we are using the GNU C compiler... yes
+checking whether mipsel-unknown-linux-uclibc-gcc accepts -g... yes
+checking for mipsel-unknown-linux-uclibc-gcc option to accept ISO C89... none needed
+checking dependency style of mipsel-unknown-linux-uclibc-gcc... gcc3
+checking for library containing strerror... none required
+checking whether make sets $(MAKE)... (cached) yes
+checking for mips-linux-ranlib... no
+checking for ranlib... ranlib
+configure: WARNING: using cross tools not prefixed with host triplet
+checking build system type... x86_64-unknown-linux-gnu
+checking host system type... mips-unknown-linux-gnu
+checking for the pthreads library -lpthreads... no
+checking whether pthreads work without any flags... no
+checking whether pthreads work with -Kthread... no
+checking whether pthreads work with -kthread... no
+checking for the pthreads library -llthread... no
+checking whether pthreads work with -pthread... yes
+checking for joinable pthread attribute... PTHREAD_CREATE_JOINABLE
+checking if more special flags are required for pthreads... no
+checking for cc_r... mipsel-unknown-linux-uclibc-gcc
+checking for gethostbyname... yes
+checking for socket... yes
+checking how to run the C preprocessor... mipsel-unknown-linux-uclibc-gcc -E
+checking for grep that handles long lines and -e... /bin/grep
+checking for egrep... /bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking arpa/inet.h usability... yes
+checking arpa/inet.h presence... yes
+checking for arpa/inet.h... yes
+checking libintl.h usability... no
+checking libintl.h presence... no
+checking for libintl.h... no
+checking netdb.h usability... yes
+checking netdb.h presence... yes
+checking for netdb.h... yes
+checking netinet/in.h usability... yes
+checking netinet/in.h presence... yes
+checking for netinet/in.h... yes
+checking for stdlib.h... (cached) yes
+checking for string.h... (cached) yes
+checking for strings.h... (cached) yes
+checking sys/socket.h usability... yes
+checking sys/socket.h presence... yes
+checking for sys/socket.h... yes
+checking sys/time.h usability... yes
+checking sys/time.h presence... yes
+checking for sys/time.h... yes
+checking syslog.h usability... yes
+checking syslog.h presence... yes
+checking for syslog.h... yes
+checking for unistd.h... (cached) yes
+checking for an ANSI C-conforming const... yes
+checking for size_t... yes
+checking for ssize_t... yes
+checking whether time.h and sys/time.h may both be included... yes
+checking whether struct tm is in sys/time.h or time.h... time.h
+checking for stdint types... stdint.h (shortcircuit)
+make use of stdint.h in include/iperf-int.h (assuming C99 compatible system)
+checking 3rd argument of accept... socklen_t
+checking for pid_t... yes
+checking vfork.h usability... no
+checking vfork.h presence... no
+checking for vfork.h... no
+checking for fork... yes
+checking for vfork... yes
+checking for working fork... cross
+configure: WARNING: result yes guessed because of cross compilation
+checking for working vfork... (cached) yes
+checking for stdlib.h... (cached) yes
+checking for GNU libc compatible malloc... (cached) yes
+checking for working memcmp... no
+checking sys/select.h usability... yes
+checking sys/select.h presence... yes
+checking for sys/select.h... yes
+checking for sys/socket.h... (cached) yes
+checking types of arguments for select... int,fd_set *,struct timeval *
+checking return type of signal handlers... void
+checking for strftime... yes
+checking for vprintf... yes
+checking for _doprnt... no
+checking for atexit... yes
+checking for gettimeofday... yes
+checking for memset... yes
+checking for pthread_cancel... no
+checking for select... yes
+checking for strchr... yes
+checking for strerror... yes
+checking for strtol... yes
+checking for usleep... yes
+checking for snprintf... yes
+checking for inet_pton... yes
+checking for inet_ntop... yes
+checking for gettimeofday... (cached) yes
+checking *printf() support for %lld... checking *printf() support for %qd... checking size of bool... 0
+checking if true is defined... yes
+checking whether byte ordering is bigendian... no
+checking for struct ip_mreq... yes
+checking whether IP_ADD_MEMBERSHIP is declared... yes
+checking for multicast support... yes
+checking whether make is GNU make... yes
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating compat/Makefile
+config.status: creating doc/Makefile
+config.status: creating include/Makefile
+config.status: creating src/Makefile
+config.status: creating man/Makefile
+config.status: creating config.h
+config.status: executing depfiles commands
+config.status: executing include/iperf-int.h commands
+config.status: creating include/iperf-int.h : _IPERF_INCLUDE_IPERF_INT_H
+make  all-recursive
+make[1]: Entering directory `/home/code/code/aps/test/network/iperf/iperf-2.0.5'
+Making all in compat
+make[2]: Entering directory `/home/code/code/aps/test/network/iperf/iperf-2.0.5/compat'
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT Thread.o -MD -MP -MF ".deps/Thread.Tpo" -c -o Thread.o Thread.c; \
+        then mv -f ".deps/Thread.Tpo" ".deps/Thread.Po"; else rm -f ".deps/Thread.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT error.o -MD -MP -MF ".deps/error.Tpo" -c -o error.o error.c; \
+        then mv -f ".deps/error.Tpo" ".deps/error.Po"; else rm -f ".deps/error.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-g++ -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT delay.o -MD -MP -MF ".deps/delay.Tpo" -c -o delay.o delay.cpp; \
+        then mv -f ".deps/delay.Tpo" ".deps/delay.Po"; else rm -f ".deps/delay.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT gettimeofday.o -MD -MP -MF ".deps/gettimeofday.Tpo" -c -o gettimeofday.o gettimeofday.c; \
+        then mv -f ".deps/gettimeofday.Tpo" ".deps/gettimeofday.Po"; else rm -f ".deps/gettimeofday.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT inet_ntop.o -MD -MP -MF ".deps/inet_ntop.Tpo" -c -o inet_ntop.o inet_ntop.c; \
+        then mv -f ".deps/inet_ntop.Tpo" ".deps/inet_ntop.Po"; else rm -f ".deps/inet_ntop.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT inet_pton.o -MD -MP -MF ".deps/inet_pton.Tpo" -c -o inet_pton.o inet_pton.c; \
+        then mv -f ".deps/inet_pton.Tpo" ".deps/inet_pton.Po"; else rm -f ".deps/inet_pton.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT signal.o -MD -MP -MF ".deps/signal.Tpo" -c -o signal.o signal.c; \
+        then mv -f ".deps/signal.Tpo" ".deps/signal.Po"; else rm -f ".deps/signal.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT snprintf.o -MD -MP -MF ".deps/snprintf.Tpo" -c -o snprintf.o snprintf.c; \
+        then mv -f ".deps/snprintf.Tpo" ".deps/snprintf.Po"; else rm -f ".deps/snprintf.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT string.o -MD -MP -MF ".deps/string.Tpo" -c -o string.o string.c; \
+        then mv -f ".deps/string.Tpo" ".deps/string.Po"; else rm -f ".deps/string.Tpo"; exit 1; fi
+rm -f libcompat.a
+ar cru libcompat.a Thread.o error.o delay.o gettimeofday.o inet_ntop.o inet_pton.o signal.o snprintf.o string.o
+ranlib libcompat.a
+make[2]: Leaving directory `/home/code/code/aps/test/network/iperf/iperf-2.0.5/compat'
+Making all in doc
+make[2]: Entering directory `/home/code/code/aps/test/network/iperf/iperf-2.0.5/doc'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/home/code/code/aps/test/network/iperf/iperf-2.0.5/doc'
+Making all in include
+make[2]: Entering directory `/home/code/code/aps/test/network/iperf/iperf-2.0.5/include'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/home/code/code/aps/test/network/iperf/iperf-2.0.5/include'
+Making all in src
+make[2]: Entering directory `/home/code/code/aps/test/network/iperf/iperf-2.0.5/src'
+if mipsel-unknown-linux-uclibc-g++ -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT Client.o -MD -MP -MF ".deps/Client.Tpo" -c -o Client.o Client.cpp; \
+        then mv -f ".deps/Client.Tpo" ".deps/Client.Po"; else rm -f ".deps/Client.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT Extractor.o -MD -MP -MF ".deps/Extractor.Tpo" -c -o Extractor.o Extractor.c; \
+        then mv -f ".deps/Extractor.Tpo" ".deps/Extractor.Po"; else rm -f ".deps/Extractor.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-g++ -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT Launch.o -MD -MP -MF ".deps/Launch.Tpo" -c -o Launch.o Launch.cpp; \
+        then mv -f ".deps/Launch.Tpo" ".deps/Launch.Po"; else rm -f ".deps/Launch.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-g++ -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT List.o -MD -MP -MF ".deps/List.Tpo" -c -o List.o List.cpp; \
+        then mv -f ".deps/List.Tpo" ".deps/List.Po"; else rm -f ".deps/List.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-g++ -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT Listener.o -MD -MP -MF ".deps/Listener.Tpo" -c -o Listener.o Listener.cpp; \
+        then mv -f ".deps/Listener.Tpo" ".deps/Listener.Po"; else rm -f ".deps/Listener.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT Locale.o -MD -MP -MF ".deps/Locale.Tpo" -c -o Locale.o Locale.c; \
+        then mv -f ".deps/Locale.Tpo" ".deps/Locale.Po"; else rm -f ".deps/Locale.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-g++ -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT PerfSocket.o -MD -MP -MF ".deps/PerfSocket.Tpo" -c -o PerfSocket.o PerfSocket.cpp; \
+        then mv -f ".deps/PerfSocket.Tpo" ".deps/PerfSocket.Po"; else rm -f ".deps/PerfSocket.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT ReportCSV.o -MD -MP -MF ".deps/ReportCSV.Tpo" -c -o ReportCSV.o ReportCSV.c; \
+        then mv -f ".deps/ReportCSV.Tpo" ".deps/ReportCSV.Po"; else rm -f ".deps/ReportCSV.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT ReportDefault.o -MD -MP -MF ".deps/ReportDefault.Tpo" -c -o ReportDefault.o ReportDefault.c; \
+        then mv -f ".deps/ReportDefault.Tpo" ".deps/ReportDefault.Po"; else rm -f ".deps/ReportDefault.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT Reporter.o -MD -MP -MF ".deps/Reporter.Tpo" -c -o Reporter.o Reporter.c; \
+        then mv -f ".deps/Reporter.Tpo" ".deps/Reporter.Po"; else rm -f ".deps/Reporter.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-g++ -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT Server.o -MD -MP -MF ".deps/Server.Tpo" -c -o Server.o Server.cpp; \
+        then mv -f ".deps/Server.Tpo" ".deps/Server.Po"; else rm -f ".deps/Server.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-g++ -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT Settings.o -MD -MP -MF ".deps/Settings.Tpo" -c -o Settings.o Settings.cpp; \
+        then mv -f ".deps/Settings.Tpo" ".deps/Settings.Po"; else rm -f ".deps/Settings.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT SocketAddr.o -MD -MP -MF ".deps/SocketAddr.Tpo" -c -o SocketAddr.o SocketAddr.c; \
+        then mv -f ".deps/SocketAddr.Tpo" ".deps/SocketAddr.Po"; else rm -f ".deps/SocketAddr.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT gnu_getopt.o -MD -MP -MF ".deps/gnu_getopt.Tpo" -c -o gnu_getopt.o gnu_getopt.c; \
+        then mv -f ".deps/gnu_getopt.Tpo" ".deps/gnu_getopt.Po"; else rm -f ".deps/gnu_getopt.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT gnu_getopt_long.o -MD -MP -MF ".deps/gnu_getopt_long.Tpo" -c -o gnu_getopt_long.o gnu_getopt_long.c; \
+        then mv -f ".deps/gnu_getopt_long.Tpo" ".deps/gnu_getopt_long.Po"; else rm -f ".deps/gnu_getopt_long.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-g++ -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT main.o -MD -MP -MF ".deps/main.Tpo" -c -o main.o main.cpp; \
+        then mv -f ".deps/main.Tpo" ".deps/main.Po"; else rm -f ".deps/main.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT service.o -MD -MP -MF ".deps/service.Tpo" -c -o service.o service.c; \
+        then mv -f ".deps/service.Tpo" ".deps/service.Po"; else rm -f ".deps/service.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT sockets.o -MD -MP -MF ".deps/sockets.Tpo" -c -o sockets.o sockets.c; \
+        then mv -f ".deps/sockets.Tpo" ".deps/sockets.Po"; else rm -f ".deps/sockets.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT stdio.o -MD -MP -MF ".deps/stdio.Tpo" -c -o stdio.o stdio.c; \
+        then mv -f ".deps/stdio.Tpo" ".deps/stdio.Po"; else rm -f ".deps/stdio.Tpo"; exit 1; fi
+if mipsel-unknown-linux-uclibc-gcc -DHAVE_CONFIG_H -I. -I. -I..  -I../include -I../include  -Wall -O2  -MT tcp_window_size.o -MD -MP -MF ".deps/tcp_window_size.Tpo" -c -o tcp_window_size.o tcp_window_size.c; \
+        then mv -f ".deps/tcp_window_size.Tpo" ".deps/tcp_window_size.Po"; else rm -f ".deps/tcp_window_size.Tpo"; exit 1; fi
+mipsel-unknown-linux-uclibc-g++ -Wall -O2   -static -o iperf -O2  -pthread  -DHAVE_CONFIG_H Client.o Extractor.o Launch.o List.o Listener.o Locale.o PerfSocket.o ReportCSV.o ReportDefault.o Reporter.o Server.o Settings.o SocketAddr.o gnu_getopt.o gnu_getopt_long.o main.o service.o sockets.o stdio.o tcp_window_size.o ../compat/libcompat.a
+SocketAddr.o: In function `SockAddr_setHostname':
+SocketAddr.c:(.text+0x68): warning: gethostbyname is obsolescent, use getnameinfo() instead.
+make[2]: Leaving directory `/home/code/code/aps/test/network/iperf/iperf-2.0.5/src'
+Making all in man
+make[2]: Entering directory `/home/code/code/aps/test/network/iperf/iperf-2.0.5/man'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/home/code/code/aps/test/network/iperf/iperf-2.0.5/man'
+make[2]: Entering directory `/home/code/code/aps/test/network/iperf/iperf-2.0.5'
+make[2]: Leaving directory `/home/code/code/aps/test/network/iperf/iperf-2.0.5'
+make[1]: Leaving directory `/home/code/code/aps/test/network/iperf/iperf-2.0.5'
+-rwxrwxr-x 1 builder builder 272236 Oct 18 16:10 iperf-2.0.5/src/iperf
