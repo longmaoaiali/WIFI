@@ -2,7 +2,7 @@
 
 ## WIFI协议  
   Beacon.vsdx -- Beacon帧字段解析，包含HE Element(WIFI6)  
-  11AXNewFeature.vsdx -- 11ax的新特性总结   
+  11AXNewFeature.vsdx -- 11ax(WIFI6)的新特性总结   
   4-way-handshake.vsdx -- 四次握手PMK生成PTK 并指示是否需要GTK    
   80211PHY_Rate.vsdx -- 物理层速率 802.11b/g/n/ac/ax   
   80211i-AKM流程.vsdx -- 80211i 认证的的两种方式介绍PSK, 802.1X Auth Server   
