@@ -30,4 +30,5 @@
   
   
 ## 常见的WIFI问题  
-
+  连接性 兼容性 WIFI性能 WIFI区域认证 wifiDisplay投屏 WFD直连 系统重启 WIFI自动化测试工具问题  
+  
