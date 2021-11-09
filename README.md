@@ -1,4 +1,4 @@
-# WIFI协议的解读, Android WIFI的代码流程, 常见的WIFI问题  
+# WIFI协议解读, Android WIFI代码流程, WIFI常见问题  
 
 ## WIFI协议  
   Beacon.vsdx -- Beacon帧字段解析，包含HE Element(WIFI6)  
