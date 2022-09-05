@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2022-09-05T14:56:00.465Z" agent="5.0 (Windows)" etag="828JLLlpzmMA9EqYhBHo" version="20.2.8" type="github">
+<mxfile host="app.diagrams.net" modified="2022-09-05T15:55:16.739Z" agent="5.0 (Windows)" etag="lmkTL3906JIhhEn_v-wd" version="20.2.8" type="github">
   <diagram id="I-43yomQ5Cz0HVFc0zDx" name="第 1 页">
     <mxGraphModel dx="1221" dy="673" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -73,21 +73,6 @@
         <mxCell id="FZFZmWa9yk7evj6stLd2-39" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="FZFZmWa9yk7evj6stLd2-38">
           <mxGeometry x="45" y="250" width="10" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="FZFZmWa9yk7evj6stLd2-46" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.934;exitY=0.084;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.917;entryY=0.892;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="FZFZmWa9yk7evj6stLd2-38" target="FZFZmWa9yk7evj6stLd2-48">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="55" y="270.03" as="sourcePoint" />
-            <mxPoint x="55.66000000000008" y="313.30999999999995" as="targetPoint" />
-            <Array as="points">
-              <mxPoint x="80" y="270" />
-              <mxPoint x="80" y="401" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="FZFZmWa9yk7evj6stLd2-47" value="&lt;div&gt;hif_config_ce_by_id&lt;/div&gt;&lt;div&gt;1.ce_init&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontFamily=Helvetica;fontColor=default;" vertex="1" connectable="0" parent="FZFZmWa9yk7evj6stLd2-46">
-          <mxGeometry x="-0.185" y="-3" relative="1" as="geometry">
-            <mxPoint x="12" y="7" as="offset" />
-          </mxGeometry>
-        </mxCell>
         <mxCell id="FZFZmWa9yk7evj6stLd2-48" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fontFamily=Helvetica;fontSize=11;fontColor=default;" vertex="1" parent="FZFZmWa9yk7evj6stLd2-38">
           <mxGeometry x="45" y="330" width="10" height="80" as="geometry" />
         </mxCell>
@@ -106,6 +91,21 @@
         </mxCell>
         <mxCell id="FZFZmWa9yk7evj6stLd2-44" value="hif_state-&gt;host_ce_config = host_ce_config_wlan_qca5018;&#xa;hif_state-&gt;target_ce_config = target_ce_config_wlan_qca5018;&#xa;scn-&gt;ce_count = QCA_5018_CE_COUNT;&#xa;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=4;spacingRight=4;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;fontFamily=Helvetica;fontSize=11;fontColor=default;" vertex="1" parent="1">
           <mxGeometry x="530" y="300" width="20" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="FZFZmWa9yk7evj6stLd2-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.934;exitY=0.084;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.917;entryY=0.892;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="645.8299999999999" y="350" as="sourcePoint" />
+            <mxPoint x="644.9999999999998" y="481.3299999999999" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="710.83" y="349.97" />
+              <mxPoint x="710.83" y="480.97" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FZFZmWa9yk7evj6stLd2-50" value="&lt;div&gt;hif_config_ce_by_id&lt;/div&gt;&lt;div&gt;1.ce_init (DMA src/dst ring)&lt;br&gt;&lt;/div&gt;&lt;div&gt;2.ce_tasklet_init&lt;/div&gt;&lt;div&gt;3.ce_register_irq&lt;/div&gt;&lt;div&gt;4.init_tasklet_worker_by_ceid&lt;br&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=left;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontFamily=Helvetica;fontColor=default;labelPosition=right;verticalLabelPosition=middle;" vertex="1" connectable="0" parent="FZFZmWa9yk7evj6stLd2-49">
+          <mxGeometry x="-0.185" y="-3" relative="1" as="geometry">
+            <mxPoint x="-48" y="18" as="offset" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
