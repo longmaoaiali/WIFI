@@ -1,0 +1,261 @@
+<mxfile host="app.diagrams.net" modified="2022-09-14T14:14:17.674Z" agent="5.0 (Windows)" etag="0NE00DiXWkYaxsYplg_X" version="20.2.8" type="github">
+  <diagram id="kgpKYQtTHZ0yAKxKKP6v" name="Page-1">
+    <mxGraphModel dx="1038" dy="1672" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="0" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-44" value="dp_main.c" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="150" y="-200" width="100" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-45" value="dp_li_rx.c" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="300" y="-200" width="100" height="860" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-46" value="quota&gt;0" style="rhombus;fontSize=8;fontColor=#FF0000;" parent="iQTnqGxFuvQCOpup2N1V-45" vertex="1">
+          <mxGeometry x="17.5" y="220" width="65" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-47" value="&lt;font style=&quot;font-size: 8px&quot;&gt;dp_rx_srng_access_start&lt;br&gt;/*access start of a hal ring*/&lt;/font&gt;" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;" parent="iQTnqGxFuvQCOpup2N1V-45" target="iQTnqGxFuvQCOpup2N1V-59" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="50" y="180" as="sourcePoint" />
+            <mxPoint x="130" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-48" value="&lt;font color=&quot;#000000&quot;&gt;ring_desc = hal_srng_dst_peek&lt;/font&gt;" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;fontColor=#FF0000;" parent="iQTnqGxFuvQCOpup2N1V-45" target="iQTnqGxFuvQCOpup2N1V-59" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="50" y="270" as="sourcePoint" />
+            <mxPoint x="130" y="270" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-49" value="&lt;font color=&quot;#000000&quot;&gt;HAL_RX_REO_BUF_COOKIE_GET&lt;/font&gt;" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;fontColor=#FF0000;" parent="iQTnqGxFuvQCOpup2N1V-45" target="iQTnqGxFuvQCOpup2N1V-59" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="50" y="380" as="sourcePoint" />
+            <mxPoint x="130" y="350" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="50" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-50" value="dp_rx_cookie_2_va_rxdma_buf&lt;br&gt;" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;fontColor=#000000;" parent="iQTnqGxFuvQCOpup2N1V-45" target="iQTnqGxFuvQCOpup2N1V-59" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="50" y="430" as="sourcePoint" />
+            <mxPoint x="130" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-51" value="hal_rx_mpdu_desc_info_get_li&lt;br&gt;/* Get MPDU DESC info */" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;fontColor=#000000;" parent="iQTnqGxFuvQCOpup2N1V-45" target="iQTnqGxFuvQCOpup2N1V-59" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="50" y="480" as="sourcePoint" />
+            <mxPoint x="130" y="480" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-52" value="hal_rx_msdu_desc_info_get_li&lt;br&gt;/* Get MSDU DESC info */" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;fontColor=#000000;" parent="iQTnqGxFuvQCOpup2N1V-45" target="iQTnqGxFuvQCOpup2N1V-59" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="50" y="510" as="sourcePoint" />
+            <mxPoint x="130" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-53" value="&lt;font color=&quot;#ff0000&quot;&gt;while(quote&amp;gt;0)&lt;/font&gt;" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;fontColor=#000000;" parent="iQTnqGxFuvQCOpup2N1V-45" target="iQTnqGxFuvQCOpup2N1V-45" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="50" y="630" as="sourcePoint" />
+            <mxPoint x="-40" y="210" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="-40" y="630" />
+              <mxPoint x="-40" y="300" />
+              <mxPoint x="-40" y="210" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-54" value="hal_srng_access_end&lt;br&gt;/*access end*/" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;fontColor=#000000;" parent="iQTnqGxFuvQCOpup2N1V-45" target="iQTnqGxFuvQCOpup2N1V-59" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="50" y="650" as="sourcePoint" />
+            <mxPoint x="130" y="650" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="140" y="650" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-55" value="&lt;font color=&quot;#000000&quot;&gt;dp_rx_wds_srcport_learn&lt;br&gt;/* WDS Source Port Learning */&lt;/font&gt;" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;fontColor=#FF0000;" parent="iQTnqGxFuvQCOpup2N1V-45" target="iQTnqGxFuvQCOpup2N1V-59" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="50" y="700" as="sourcePoint" />
+            <mxPoint x="130" y="700" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-56" value="&lt;font style=&quot;font-size: 8px&quot;&gt;dp_service_srngs&lt;br&gt;dp_rx_process&lt;br&gt;dp_rx_process_li&lt;/font&gt;" style="html=1;verticalAlign=bottom;startArrow=oval;endArrow=block;startSize=8;" parent="1" source="iQTnqGxFuvQCOpup2N1V-44" target="iQTnqGxFuvQCOpup2N1V-45" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="204.5000000000001" y="-40.080000000000155" as="sourcePoint" />
+            <mxPoint x="345" y="-40" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-57" value="dp_service_srngs() - Top level interrupt handler for DP Ring interrupt" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="40" y="-110" width="260" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-58" value="dp_rx_process_li() - Brain of the Rx processing functionality&#xa;Called from the bottom half (tasklet/NET_RX_SOFTIRQ)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="100" y="-30" width="230" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-59" value="dp_rx.c" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="470" y="-200" width="100" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-60" value="&lt;span style=&quot;background-color: rgb(248 , 249 , 250)&quot;&gt;&lt;font color=&quot;#000000&quot;&gt;osif_deliver_data_ol&lt;br&gt;osif_deliver_data_ol_extended&lt;br&gt;osif_ol_delay_processing&lt;br&gt;osif_ol_no_nss_accel&lt;/font&gt;&lt;br&gt;&lt;/span&gt;" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;fontColor=#FF0000;" parent="iQTnqGxFuvQCOpup2N1V-59" target="iQTnqGxFuvQCOpup2N1V-76" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="50" y="890" as="sourcePoint" />
+            <mxPoint x="130" y="860" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="50" y="890" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-61" value="return" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;fontSize=8;" parent="1" source="iQTnqGxFuvQCOpup2N1V-59" target="iQTnqGxFuvQCOpup2N1V-45" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="510" y="20" as="sourcePoint" />
+            <mxPoint x="430" y="20" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="490" />
+              <mxPoint x="450" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-62" value="hal_srng_dst_get_next&lt;br&gt;/* Pop out the descriptor*/" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;" parent="1" source="iQTnqGxFuvQCOpup2N1V-45" target="iQTnqGxFuvQCOpup2N1V-59" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="350" y="70" as="sourcePoint" />
+            <mxPoint x="430" y="70" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="410" y="120" />
+              <mxPoint x="450" y="120" />
+              <mxPoint x="490" y="120" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-63" value="return" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;fontSize=8;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="519.69" y="90" as="sourcePoint" />
+            <mxPoint x="350.0003448275863" y="90" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="460.19" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-64" value="return" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;fontSize=8;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="519.69" y="140" as="sourcePoint" />
+            <mxPoint x="350.00034482758633" y="140" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="460.19" y="140" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-65" value="This is the main function in the datapath for Rx (normal pkts). It is split into 3 tasks.&#xa;1. DMA REAP&#xa;• Reap the reo_destination_ring till the ring is empty or we reach the allocated quota&#xa;• Get the cookie from reo_destination descriptor and from cookie get the corresponding nbuf.&#xa;2. Buffer Replenish.&#xa;3. Frame Processing.&#xa;• WDS source port learning&#xa;• Intra-bss forwarding&#xa;• update stats.&#xa;• Deliver nbufs to network stack." style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="530" y="-60" width="340" height="113" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-66" value="return" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;fontSize=8;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="519.69" y="200.00000000000023" as="sourcePoint" />
+            <mxPoint x="350.00034482758633" y="200.00000000000023" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="460.19" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-67" value="Converts cookie to a virtual address of the Rx descriptor on Rx DMA source ring buffer" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="520" y="220" width="320" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-68" value="return" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;fontSize=8;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="520.0000000000002" y="250.00000000000023" as="sourcePoint" />
+            <mxPoint x="350.31034482758633" y="250.00000000000023" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="460.5" y="250" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-69" value="return" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;fontSize=8;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="520.0000000000002" y="330.0000000000002" as="sourcePoint" />
+            <mxPoint x="350.3103448275863" y="330.0000000000002" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="460.5" y="330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-70" value="Save mpdu  &#xa;msdu info to rx_desc-&gt;nbuf-&gt;cb&#xa;/*Append nbuf to nbuf_list*/ DP_RX_PROCESS_NBUF&#xa;/*Add rx_desc to free_list*/  dp_rx_add_to_free_desc_list&#xa;quota--" style="fontStyle=0;fontSize=8;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="280" y="350" width="210" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-71" value="return" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;fontSize=8;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="520.0000000000002" y="470.0000000000002" as="sourcePoint" />
+            <mxPoint x="350.3103448275863" y="470.0000000000002" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="460.5" y="470" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-72" value="&lt;font color=&quot;#000000&quot;&gt;DP_RX_INTRABSS_FWD&lt;br&gt;dp_rx_intrabss_fwd&lt;br&gt;/* Intrabss-fwd */&lt;br&gt;&lt;/font&gt;" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;fontColor=#FF0000;" parent="1" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="350.5" y="540" as="sourcePoint" />
+            <mxPoint x="520.0000000000002" y="540" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-73" value="&lt;font color=&quot;#000000&quot;&gt;dp_rx_update_stats&lt;br&gt;/*update RX stats*/&lt;br&gt;&lt;/font&gt;" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;fontColor=#FF0000;" parent="1" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="350.5" y="580" as="sourcePoint" />
+            <mxPoint x="520.0000000000002" y="580" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-74" value="&lt;font color=&quot;#000000&quot;&gt;dp_rx_deliver_to_stack&lt;br&gt;/*deliver to net stack*/&lt;br&gt;&lt;/font&gt;" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;fontColor=#FF0000;" parent="1" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="350.5" y="620" as="sourcePoint" />
+            <mxPoint x="520.0000000000002" y="620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-75" value="vdev-&gt;osif_rx = txrx_ops-&gt;rx.rx&#xa;vdev-&gt;osif_fisa_rx = txrx_ops-&gt;rx.osif_fisa_rx;&#xa;ops.rx.rx = (ol_txrx_rx_fp) osif_deliver_data_ol" style="fontStyle=0;fontSize=8;fontColor=#000000;labelPosition=center;verticalLabelPosition=middle;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="530" y="590" width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-76" value="qca-wifi&lt;br&gt;osif_ol.c" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="680" y="520" width="100" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-77" value="&lt;font color=&quot;#000000&quot;&gt;netif_receive_skb&lt;br&gt;netif_receive_skb_internal&lt;br&gt;&lt;div&gt;__netif_receive_skb&lt;/div&gt;&lt;div&gt;__netif_receive_skb_core&lt;/div&gt;&lt;/font&gt;" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;fontColor=#FF0000;" parent="iQTnqGxFuvQCOpup2N1V-76" target="iQTnqGxFuvQCOpup2N1V-78" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="50" y="200" as="sourcePoint" />
+            <mxPoint x="130" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-78" value="Linux Net Stack&lt;br&gt;dev.c" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="830" y="520" width="100" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-79" value="&lt;font color=&quot;#000000&quot;&gt;rx_handler = rcu_dereference(skb-&amp;gt;dev-&amp;gt;rx_handler);&lt;br&gt;rx_handler(&amp;amp;skb)&lt;br&gt;netdev_rx_handler_register(dev, &lt;b&gt;br_handle_frame&lt;/b&gt;, p);&lt;br&gt;&lt;/font&gt;" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;fontColor=#0000FF;" parent="iQTnqGxFuvQCOpup2N1V-78" target="iQTnqGxFuvQCOpup2N1V-81" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="50" y="240" as="sourcePoint" />
+            <mxPoint x="130" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-80" value="refer to:https://blog.csdn.net/qq_20817327/article/details/106752029" style="fontStyle=0;fontSize=8;labelPosition=center;verticalLabelPosition=middle;align=center;verticalAlign=middle;fontColor=#0000FF;" parent="1" vertex="1">
+          <mxGeometry x="620" y="730" width="250" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-81" value="Linux Bridge&lt;br&gt;br_input.c" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="1060" y="520" width="100" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-82" value="&lt;font&gt;br_handle_frame&lt;br&gt;br_forward&lt;br&gt;br_forward_finish&lt;br&gt;&lt;/font&gt;" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;" parent="iQTnqGxFuvQCOpup2N1V-81" target="iQTnqGxFuvQCOpup2N1V-83" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="50" y="270" as="sourcePoint" />
+            <mxPoint x="130" y="270" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="100" y="270" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-83" value="Linux Bridge&lt;br&gt;br_forward.c" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="1180" y="520" width="100" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-84" value="BR_HOOK(NFPROTO_BRIDGE, NF_BR_POST_ROUTING, net, sk, skb, NULL, skb-&gt;dev, br_dev_queue_push_xmit);&#xa;NF_HOOK&#xa;NF_HOOK_THRESH&#xa; nf_hook_thresh&#xa; nf_hook_slow(skb, &amp;state);&#xa;  nf_iterate(state-&gt;hook_list, skb, state, &amp;elem);&#xa;  list_for_each_entry_continue_rcu((*elemp), head, list) {&#xa;   verdict = (*elemp)-&gt;hook((*elemp)-&gt;priv, skb, state); //struct nf_hook_ops **elemp }&#xa;&#xa;static struct nf_hook_ops ecm_nss_ipv4_netfilter_hooks[] __read_mostly = {&#xa; {&#xa;  .hook  = ecm_nss_ipv4_bridge_post_routing_hook,&#xa;  .pf  = PF_BRIDGE,&#xa;  .hooknum = NF_BR_POST_ROUTING,&#xa;  .priority = NF_BR_PRI_FILTER_OTHER,&#xa; },}" style="fontStyle=0;fontSize=8;labelPosition=center;verticalLabelPosition=middle;align=left;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="1140" y="580" width="430" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-85" value="NSS ECM&lt;br&gt;ecm_nss_ipv4.c" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="1560" y="520" width="100" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="iQTnqGxFuvQCOpup2N1V-86" value="ecm_nss_ipv4_bridge_post_routing_hook&lt;br&gt;ecm_nss_ipv4_ip_process&lt;br&gt;/*ECM&amp;nbsp;Process IP datagram skb*/" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=8;fontColor=#000000;" parent="1" target="iQTnqGxFuvQCOpup2N1V-85" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="1230" y="820" as="sourcePoint" />
+            <mxPoint x="1310" y="820" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
